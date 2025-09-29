@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator } from "@/types";
+import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator, ActivityLog } from "@/types";
 import { loadData, saveData } from "@/utils/storage";
 import { generateId } from "@/utils/idGenerator";
 
@@ -78,11 +78,32 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setData((prev) => ({ ...prev, currentInvestigator: undefined }));
   };
 
+  // Activity Log helper
+  const addActivityLog = (action: string, entityType: string, entityId: string) => {
+    if (!currentInvestigator) return;
+    
+    const log: ActivityLog = {
+      id: generateId("LOG", data.activityLogs.map((l) => l.id)),
+      investigatorId: currentInvestigator.id,
+      investigatorName: currentInvestigator.name,
+      action,
+      entityType,
+      entityId,
+      timestamp: new Date().toISOString(),
+    };
+    
+    setData((prev) => ({ 
+      ...prev, 
+      activityLogs: [log, ...prev.activityLogs].slice(0, 100) // Keep only last 100 logs
+    }));
+  };
+
   // People methods
   const addPerson = (person: Omit<Person, "id" | "createdAt">) => {
     const id = generateId("P", data.people.map((p) => p.id));
     const newPerson: Person = { ...person, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, people: [...prev.people, newPerson] }));
+    addActivityLog("Adicionou pessoa", "Person", id);
   };
 
   const updatePerson = (id: string, person: Partial<Person>) => {
@@ -90,10 +111,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       people: prev.people.map((p) => (p.id === id ? { ...p, ...person } : p)),
     }));
+    addActivityLog("Atualizou pessoa", "Person", id);
   };
 
   const deletePerson = (id: string) => {
     setData((prev) => ({ ...prev, people: prev.people.filter((p) => p.id !== id) }));
+    addActivityLog("Deletou pessoa", "Person", id);
   };
 
   const getPerson = (id: string) => data.people.find((p) => p.id === id);
@@ -143,6 +166,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("C", data.cases.map((c) => c.id));
     const newCase: Case = { ...caseData, id, status: "open", createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, cases: [...prev.cases, newCase] }));
+    addActivityLog("Criou caso", "Case", id);
   };
 
   const updateCase = (id: string, caseData: Partial<Case>) => {
@@ -150,6 +174,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       cases: prev.cases.map((c) => (c.id === id ? { ...c, ...caseData } : c)),
     }));
+    addActivityLog("Atualizou caso", "Case", id);
   };
 
   const closeCase = (id: string, reason: string) => {
@@ -159,6 +184,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         c.id === id ? { ...c, status: "closed" as const, closedReason: reason, closedAt: new Date().toISOString() } : c
       ),
     }));
+    addActivityLog("Fechou caso", "Case", id);
   };
 
   const deleteCase = (id: string) => {

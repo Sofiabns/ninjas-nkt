@@ -10,7 +10,7 @@ export default function Login() {
   const { data, setCurrentInvestigator } = useApp();
   const [selectedId, setSelectedId] = useState<string>("");
   const [typingText, setTypingText] = useState("");
-  const fullText = "> Seleccione um investigador para iniciar";
+  const fullText = "> Selecione um investigador para iniciar";
 
   useEffect(() => {
     let index = 0;
@@ -35,9 +35,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* System status top-left */}
+      {/* System status top-left - static */}
       <div className="absolute top-4 left-4 text-primary text-sm font-mono">
-        <span className="cursor-blink">SYSTEM_ONLINE...</span>
+        <span>SYSTEM_ONLINE...</span>
       </div>
 
       {/* Main content */}
@@ -65,40 +65,13 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Investigator cards grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-8">
-          {data.investigators.map((inv, index) => (
-            <motion.div
-              key={inv.id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
-              className={`p-3 bg-card border-2 rounded cursor-pointer transition-all ${
-                selectedId === inv.id
-                  ? "border-primary box-glow"
-                  : "border-border hover:border-accent"
-              }`}
-              onClick={() => setSelectedId(inv.id)}
-            >
-              <div className="aspect-square bg-secondary rounded mb-2 flex items-center justify-center overflow-hidden">
-                {inv.photoUrl ? (
-                  <img src={inv.photoUrl} alt={inv.name} className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-2xl text-muted-foreground">{inv.name[0]}</span>
-                )}
-              </div>
-              <p className="text-sm font-mono text-foreground">{inv.name}</p>
-            </motion.div>
-          ))}
-        </div>
-
         {/* Dropdown selector */}
-        <div className="max-w-md mx-auto">
+        <div className="max-w-md mx-auto mt-8">
           <Select value={selectedId} onValueChange={setSelectedId}>
-            <SelectTrigger className="w-full bg-input border-border">
+            <SelectTrigger className="w-full bg-input border-border text-foreground">
               <SelectValue placeholder="Selecione um investigador" />
             </SelectTrigger>
-            <SelectContent className="bg-popover border-border z-50">
+            <SelectContent className="bg-popover border-border z-50 max-h-[300px]">
               {data.investigators.map((inv) => (
                 <SelectItem key={inv.id} value={inv.id} className="hover:bg-secondary">
                   {inv.name} ({inv.id})

@@ -75,33 +75,28 @@ export default function Dashboard() {
         className="mt-8"
       >
         <Card className="p-6 bg-card border-border">
-          <h2 className="text-xl font-bold text-primary mb-4">ATIVIDADE RECENTE</h2>
+          <h2 className="text-xl font-bold text-primary mb-4">LOG DE ATIVIDADES</h2>
           
-          <div className="space-y-3">
-            {data.cases.slice(0, 5).map((caseItem) => (
+          <div className="space-y-2">
+            {data.activityLogs.slice(0, 10).map((log) => (
               <div
-                key={caseItem.id}
+                key={log.id}
                 className="flex items-center justify-between p-3 bg-secondary rounded border border-border"
               >
-                <div>
-                  <p className="font-mono text-sm text-foreground">{caseItem.title}</p>
-                  <p className="text-xs text-muted-foreground">{caseItem.id}</p>
+                <div className="flex-1">
+                  <p className="font-mono text-sm text-foreground">
+                    <span className="text-accent">{log.investigatorName}</span> {log.action}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {log.entityType} {log.entityId} • {new Date(log.timestamp).toLocaleString()}
+                  </p>
                 </div>
-                <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    caseItem.status === "open"
-                      ? "bg-primary/20 text-primary"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {caseItem.status === "open" ? "ATIVO" : "FECHADO"}
-                </span>
               </div>
             ))}
             
-            {data.cases.length === 0 && (
+            {data.activityLogs.length === 0 && (
               <p className="text-center text-muted-foreground text-sm py-4">
-                Nenhum caso registrado ainda
+                Nenhuma atividade registrada ainda
               </p>
             )}
           </div>

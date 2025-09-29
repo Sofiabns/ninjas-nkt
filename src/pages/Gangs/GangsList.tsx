@@ -74,6 +74,13 @@ export default function GangsList() {
                   <div>
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-accent font-mono text-sm">{gang.id}</span>
+                      {gang.color && (
+                        <div
+                          className="w-6 h-6 rounded border-2 border-border"
+                          style={{ backgroundColor: gang.color }}
+                          title={`Cor: ${gang.color}`}
+                        />
+                      )}
                       <h3 className="text-2xl font-bold text-foreground">{gang.name}</h3>
                     </div>
                     <p className="text-muted-foreground">{gang.description}</p>

@@ -13,6 +13,7 @@ import CaseForm from "./pages/Cases/CaseForm";
 import CaseDetails from "./pages/Cases/CaseDetails";
 import InvestigationsList from "./pages/Investigations/InvestigationsList";
 import InvestigationForm from "./pages/Investigations/InvestigationForm";
+import InvestigationDetails from "./pages/Investigations/InvestigationDetails";
 import PeopleList from "./pages/People/PeopleList";
 import PersonForm from "./pages/People/PersonForm";
 import PersonDetails from "./pages/People/PersonDetails";
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/investigations" element={<InvestigationsList />} />
               <Route path="/investigations/new" element={<InvestigationForm />} />
               <Route path="/investigations/edit/:id" element={<InvestigationForm />} />
+              <Route path="/investigations/:id" element={<InvestigationDetails />} />
               <Route path="/people" element={<PeopleList />} />
               <Route path="/people/new" element={<PersonForm />} />
               <Route path="/people/edit/:id" element={<PersonForm />} />

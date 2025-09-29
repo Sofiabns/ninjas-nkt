@@ -24,6 +24,7 @@ export const getDefaultData = (): AppData => ({
   investigations: [],
   charges: [],
   bases: [],
+  activityLogs: [],
 });
 
 export const loadData = (): AppData => {
@@ -34,6 +35,10 @@ export const loadData = (): AppData => {
       // Ensure investigators are always present
       if (!parsed.investigators || parsed.investigators.length === 0) {
         parsed.investigators = defaultInvestigators;
+      }
+      // Ensure activityLogs exist (backward compatibility)
+      if (!parsed.activityLogs) {
+        parsed.activityLogs = [];
       }
       return parsed;
     }

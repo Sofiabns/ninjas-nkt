@@ -81,6 +81,16 @@ export interface Base {
   createdAt: string;
 }
 
+export interface ActivityLog {
+  id: string;
+  investigatorId: string;
+  investigatorName: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  timestamp: string;
+}
+
 export interface AppData {
   investigators: Investigator[];
   people: Person[];
@@ -90,5 +100,6 @@ export interface AppData {
   investigations: Investigation[];
   charges: Charge[];
   bases: Base[];
+  activityLogs: ActivityLog[];
   currentInvestigator?: string;
 }
