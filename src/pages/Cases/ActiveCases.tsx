@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/common/SearchInput";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
-import { fetchCases, closeCaseFB, deleteCaseFB } from "@/services/casesService";
 import { useNavigate } from "react-router-dom";
 import {
   Dialog,

@@ -1,26 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Eye, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/common/SearchInput";
+import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { getCases, deleteCase } from "@/services/casesService";
 
 export default function ArchivedCases() {
-  const [cases, setCases] = useState<any[]>([]);
-  const [search, setSearch] = useState("");
+  const { data, deleteCase } = useApp();
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    (async () => {
-      const allCases = await getCases();
-      setCases(allCases);
-    })();
-  }, []);
-
-  const archivedCases = cases.filter((c) => c.status === "closed");
+  const archivedCases = data.cases.filter((c) => c.status === "closed");
 
   const filtered = archivedCases.filter(
     (c) =>
@@ -28,10 +21,9 @@ export default function ArchivedCases() {
       c.id.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (confirm("Tem certeza que deseja deletar este caso arquivado?")) {
-      await deleteCase(id);
-      setCases((prev) => prev.filter((c) => c.id !== id));
+      deleteCase(id);
       toast.success("Caso deletado");
     }
   };
@@ -65,7 +57,7 @@ export default function ArchivedCases() {
                       FECHADO
                     </span>
                   </div>
-
+                  
                   {caseItem.closedReason && (
                     <div className="mb-2 p-2 bg-secondary rounded border border-border">
                       <p className="text-xs font-mono text-accent mb-1">MOTIVO DO FECHAMENTO:</p>
@@ -77,10 +69,7 @@ export default function ArchivedCases() {
                     {caseItem.description}
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>
-                      Fechado em:{" "}
-                      {new Date(caseItem.closedAt || caseItem.createdAt).toLocaleDateString()}
-                    </span>
+                    <span>Fechado em: {new Date(caseItem.closedAt || caseItem.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
 
