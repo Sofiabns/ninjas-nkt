@@ -38,6 +38,12 @@ export default function Dashboard() {
       icon: Building,
       color: "text-primary",
     },
+    {
+      label: "FACÇÕES",
+      value: data.gangs.length,
+      icon: Users,
+      color: "text-accent",
+    },
   ];
 
   return (

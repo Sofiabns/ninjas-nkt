@@ -91,6 +91,39 @@ export interface ActivityLog {
   timestamp: string;
 }
 
+export interface Meeting {
+  id: string;
+  title: string;
+  description: string;
+  personIds: string[];
+  vehicleIds: string[];
+  gangIds: string[];
+  attachments: Attachment[];
+  meetingDate: string;
+  createdAt: string;
+}
+
+export interface Deep {
+  id: string;
+  title: string;
+  description: string;
+  images: string[];
+  createdAt: string;
+}
+
+export interface AuctionEntry {
+  gangId: string;
+  item: string;
+  amount: number;
+}
+
+export interface Auction {
+  id: string;
+  title: string;
+  entries: AuctionEntry[];
+  createdAt: string;
+}
+
 export interface AppData {
   investigators: Investigator[];
   people: Person[];
@@ -100,6 +133,9 @@ export interface AppData {
   investigations: Investigation[];
   charges: Charge[];
   bases: Base[];
+  meetings: Meeting[];
+  deeps: Deep[];
+  auctions: Auction[];
   activityLogs: ActivityLog[];
   currentInvestigator?: string;
 }

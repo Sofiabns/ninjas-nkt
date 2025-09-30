@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator, ActivityLog } from "@/types";
+import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator, ActivityLog, Meeting, Deep, Auction } from "@/types";
 import { loadData, saveData } from "@/utils/storage";
 import { generateId } from "@/utils/idGenerator";
 
@@ -49,6 +49,21 @@ interface AppContextType {
   addBase: (base: Omit<Base, "id" | "createdAt">) => void;
   updateBase: (id: string, base: Partial<Base>) => void;
   deleteBase: (id: string) => void;
+  
+  // Meetings
+  addMeeting: (meeting: Omit<Meeting, "id" | "createdAt">) => void;
+  updateMeeting: (id: string, meeting: Partial<Meeting>) => void;
+  deleteMeeting: (id: string) => void;
+  
+  // Deeps
+  addDeep: (deep: Omit<Deep, "id" | "createdAt">) => void;
+  updateDeep: (id: string, deep: Partial<Deep>) => void;
+  deleteDeep: (id: string) => void;
+  
+  // Auctions
+  addAuction: (auction: Omit<Auction, "id" | "createdAt">) => void;
+  updateAuction: (id: string, auction: Partial<Auction>) => void;
+  deleteAuction: (id: string) => void;
   
   // Investigators
   updateInvestigators: (investigators: Investigator[]) => void;
@@ -249,6 +264,60 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setData((prev) => ({ ...prev, bases: prev.bases.filter((b) => b.id !== id) }));
   };
 
+  // Meetings methods
+  const addMeeting = (meeting: Omit<Meeting, "id" | "createdAt">) => {
+    const id = generateId("M", data.meetings.map((m) => m.id));
+    const newMeeting: Meeting = { ...meeting, id, createdAt: new Date().toISOString() };
+    setData((prev) => ({ ...prev, meetings: [...prev.meetings, newMeeting] }));
+  };
+
+  const updateMeeting = (id: string, meeting: Partial<Meeting>) => {
+    setData((prev) => ({
+      ...prev,
+      meetings: prev.meetings.map((m) => (m.id === id ? { ...m, ...meeting } : m)),
+    }));
+  };
+
+  const deleteMeeting = (id: string) => {
+    setData((prev) => ({ ...prev, meetings: prev.meetings.filter((m) => m.id !== id) }));
+  };
+
+  // Deeps methods
+  const addDeep = (deep: Omit<Deep, "id" | "createdAt">) => {
+    const id = generateId("D", data.deeps.map((d) => d.id));
+    const newDeep: Deep = { ...deep, id, createdAt: new Date().toISOString() };
+    setData((prev) => ({ ...prev, deeps: [...prev.deeps, newDeep] }));
+  };
+
+  const updateDeep = (id: string, deep: Partial<Deep>) => {
+    setData((prev) => ({
+      ...prev,
+      deeps: prev.deeps.map((d) => (d.id === id ? { ...d, ...deep } : d)),
+    }));
+  };
+
+  const deleteDeep = (id: string) => {
+    setData((prev) => ({ ...prev, deeps: prev.deeps.filter((d) => d.id !== id) }));
+  };
+
+  // Auctions methods
+  const addAuction = (auction: Omit<Auction, "id" | "createdAt">) => {
+    const id = generateId("A", data.auctions.map((a) => a.id));
+    const newAuction: Auction = { ...auction, id, createdAt: new Date().toISOString() };
+    setData((prev) => ({ ...prev, auctions: [...prev.auctions, newAuction] }));
+  };
+
+  const updateAuction = (id: string, auction: Partial<Auction>) => {
+    setData((prev) => ({
+      ...prev,
+      auctions: prev.auctions.map((a) => (a.id === id ? { ...a, ...auction } : a)),
+    }));
+  };
+
+  const deleteAuction = (id: string) => {
+    setData((prev) => ({ ...prev, auctions: prev.auctions.filter((a) => a.id !== id) }));
+  };
+
   // Investigators methods
   const updateInvestigators = (investigators: Investigator[]) => {
     setData((prev) => ({ ...prev, investigators }));
@@ -301,6 +370,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addBase,
     updateBase,
     deleteBase,
+    addMeeting,
+    updateMeeting,
+    deleteMeeting,
+    addDeep,
+    updateDeep,
+    deleteDeep,
+    addAuction,
+    updateAuction,
+    deleteAuction,
     updateInvestigators,
     exportData: exportDataMethod,
     importData: importDataMethod,

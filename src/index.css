@@ -8,26 +8,26 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Cyberpunk / Hacker Terminal Theme - Softer colors */
+    /* Cyberpunk / Hacker Terminal Theme - More visible colors */
     --background: 0 0% 0%;
-    --foreground: 120 70% 45%;
+    --foreground: 142 70% 85%;
 
     --card: 0 0% 10%;
-    --card-foreground: 120 70% 45%;
+    --card-foreground: 142 70% 85%;
 
     --popover: 0 0% 10%;
-    --popover-foreground: 120 70% 45%;
+    --popover-foreground: 142 70% 85%;
 
-    --primary: 120 70% 45%;
+    --primary: 142 60% 45%;
     --primary-foreground: 0 0% 0%;
 
     --secondary: 0 0% 20%;
-    --secondary-foreground: 120 70% 45%;
+    --secondary-foreground: 142 70% 85%;
 
     --muted: 0 0% 20%;
-    --muted-foreground: 120 50% 35%;
+    --muted-foreground: 142 50% 70%;
 
-    --accent: 180 70% 45%;
+    --accent: 180 80% 45%;
     --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;

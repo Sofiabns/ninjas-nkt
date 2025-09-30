@@ -1,6 +1,7 @@
-import React, { useRef } from "react";
-import { Upload, X } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Upload, X, Download, Link as LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { fileToDataUrl } from "@/utils/validation";
 import { Attachment } from "@/types";
 
@@ -8,10 +9,12 @@ interface FileUploadProps {
   attachments: Attachment[];
   onChange: (attachments: Attachment[]) => void;
   multiple?: boolean;
+  allowUrl?: boolean;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, multiple = true }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, multiple = true, allowUrl = true }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [urlInput, setUrlInput] = useState("");
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -38,6 +41,28 @@ export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, m
     onChange(attachments.filter((a) => a.id !== id));
   };
 
+  const handleAddUrl = () => {
+    if (!urlInput.trim()) return;
+    
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(urlInput);
+    onChange([...attachments, {
+      id: `url-${Date.now()}`,
+      name: urlInput.split('/').pop() || 'URL',
+      url: urlInput,
+      type: isImage ? 'image/url' : 'application/url',
+    }]);
+    setUrlInput("");
+  };
+
+  const handleDownload = (attachment: Attachment) => {
+    const link = document.createElement('a');
+    link.href = attachment.url;
+    link.download = attachment.name;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="space-y-2">
       <input
@@ -49,15 +74,37 @@ export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, m
         accept="image/*,.pdf,.doc,.docx,.zip"
       />
       
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => inputRef.current?.click()}
-        className="w-full border-border hover:bg-secondary"
-      >
-        <Upload className="mr-2 h-4 w-4" />
-        Adicionar Anexos
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => inputRef.current?.click()}
+          className="flex-1 border-border hover:bg-secondary"
+        >
+          <Upload className="mr-2 h-4 w-4" />
+          Upload Arquivo
+        </Button>
+        {allowUrl && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleAddUrl}
+            className="border-border hover:bg-secondary"
+          >
+            <LinkIcon className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+
+      {allowUrl && (
+        <Input
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          placeholder="Ou cole uma URL de imagem..."
+          className="bg-input border-border"
+          onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddUrl())}
+        />
+      )}
 
       {attachments.length > 0 && (
         <div className="space-y-2">
@@ -71,6 +118,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, m
                 </div>
               )}
               <span className="flex-1 text-sm truncate">{attachment.name}</span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => handleDownload(attachment)}
+                className="h-8 w-8"
+              >
+                <Download className="h-4 w-4" />
+              </Button>
               <Button
                 type="button"
                 variant="ghost"

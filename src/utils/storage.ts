@@ -24,6 +24,9 @@ export const getDefaultData = (): AppData => ({
   investigations: [],
   charges: [],
   bases: [],
+  meetings: [],
+  deeps: [],
+  auctions: [],
   activityLogs: [],
 });
 
@@ -39,6 +42,16 @@ export const loadData = (): AppData => {
       // Ensure activityLogs exist (backward compatibility)
       if (!parsed.activityLogs) {
         parsed.activityLogs = [];
+      }
+      // Ensure meetings, deeps, auctions exist (backward compatibility)
+      if (!parsed.meetings) {
+        parsed.meetings = [];
+      }
+      if (!parsed.deeps) {
+        parsed.deeps = [];
+      }
+      if (!parsed.auctions) {
+        parsed.auctions = [];
       }
       return parsed;
     }

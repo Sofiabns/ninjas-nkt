@@ -25,6 +25,9 @@ const menuItems = [
   { icon: Building, label: "BASES", path: "/bases" },
   { icon: Scale, label: "COBRANÇAS", path: "/charges" },
   { icon: Users2, label: "GERENCIAR FACÇÕES", path: "/gangs" },
+  { icon: Users, label: "REUNIÕES", path: "/meetings" },
+  { icon: Building, label: "DEEPS", path: "/deeps" },
+  { icon: Scale, label: "LEILÕES", path: "/auctions" },
   { icon: Archive, label: "CASOS ARQUIVADOS", path: "/cases/archived" },
 ];
 

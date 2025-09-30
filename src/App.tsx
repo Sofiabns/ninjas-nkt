@@ -21,10 +21,20 @@ import VehiclesList from "./pages/Vehicles/VehiclesList";
 import VehicleForm from "./pages/Vehicles/VehicleForm";
 import BasesList from "./pages/Bases/BasesList";
 import BaseForm from "./pages/Bases/BaseForm";
+import BaseDetails from "./pages/Bases/BaseDetails";
 import ChargesList from "./pages/Charges/ChargesList";
 import ChargeForm from "./pages/Charges/ChargeForm";
 import GangsList from "./pages/Gangs/GangsList";
 import GangForm from "./pages/Gangs/GangForm";
+import MeetingsList from "./pages/Meetings/MeetingsList";
+import MeetingForm from "./pages/Meetings/MeetingForm";
+import MeetingDetails from "./pages/Meetings/MeetingDetails";
+import DeepsList from "./pages/Deeps/DeepsList";
+import DeepForm from "./pages/Deeps/DeepForm";
+import DeepDetails from "./pages/Deeps/DeepDetails";
+import AuctionsList from "./pages/Auctions/AuctionsList";
+import AuctionForm from "./pages/Auctions/AuctionForm";
+import AuctionDetails from "./pages/Auctions/AuctionDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,12 +68,26 @@ const App = () => (
               <Route path="/vehicles/edit/:id" element={<VehicleForm />} />
               <Route path="/bases" element={<BasesList />} />
               <Route path="/bases/new" element={<BaseForm />} />
+              <Route path="/bases/edit/:id" element={<BaseForm />} />
+              <Route path="/bases/:id" element={<BaseDetails />} />
               <Route path="/charges" element={<ChargesList />} />
               <Route path="/charges/new" element={<ChargeForm />} />
               <Route path="/charges/edit/:id" element={<ChargeForm />} />
               <Route path="/gangs" element={<GangsList />} />
               <Route path="/gangs/new" element={<GangForm />} />
               <Route path="/gangs/edit/:id" element={<GangForm />} />
+              <Route path="/meetings" element={<MeetingsList />} />
+              <Route path="/meetings/new" element={<MeetingForm />} />
+              <Route path="/meetings/edit/:id" element={<MeetingForm />} />
+              <Route path="/meetings/:id" element={<MeetingDetails />} />
+              <Route path="/deeps" element={<DeepsList />} />
+              <Route path="/deeps/new" element={<DeepForm />} />
+              <Route path="/deeps/edit/:id" element={<DeepForm />} />
+              <Route path="/deeps/:id" element={<DeepDetails />} />
+              <Route path="/auctions" element={<AuctionsList />} />
+              <Route path="/auctions/new" element={<AuctionForm />} />
+              <Route path="/auctions/edit/:id" element={<AuctionForm />} />
+              <Route path="/auctions/:id" element={<AuctionDetails />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
