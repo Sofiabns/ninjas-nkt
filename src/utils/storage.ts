@@ -6,13 +6,13 @@ const defaultInvestigators: Investigator[] = [
   { id: "INV-01", name: "Hinata" },
   { id: "INV-02", name: "Luciano" },
   { id: "INV-03", name: "Miranda" },
-  { id: "INV-04", name: "Lara" },
+  { id: "INV-04", name: "Lua" },
   { id: "INV-05", name: "Hiro" },
-  { id: "INV-06", name: "Naira" },
-  { id: "INV-07", name: "Miguel" },
-  { id: "INV-08", name: "Eloa" },
+  { id: "INV-06", name: "Eloa" },
+  { id: "INV-07", name: "Lara" },
+  { id: "INV-08", name: "Naira" },
   { id: "INV-09", name: "Noah" },
-  { id: "INV-10", name: "Lua" },
+  { id: "INV-10", name: "Miguel" },
 ];
 
 export const getDefaultData = (): AppData => ({
