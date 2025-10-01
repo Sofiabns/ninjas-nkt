@@ -136,12 +136,15 @@ export default function VehicleForm() {
             <label className="text-sm font-mono text-foreground mb-2 block">
               PROPRIETÁRIO (OPCIONAL)
             </label>
-            <Select value={ownerId} onValueChange={setOwnerId}>
+            <Select
+              value={ownerId === "" ? "none" : ownerId}
+              onValueChange={(value) => setOwnerId(value === "none" ? "" : value)}
+            >
               <SelectTrigger className="bg-input border-border">
                 <SelectValue placeholder="Selecione o proprietário" />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border z-50">
-                <SelectItem value="">Nenhum</SelectItem>
+                <SelectItem value="none">Nenhum</SelectItem>
                 {(data?.people ?? []).map((person) => (
                   <SelectItem key={person.id} value={person.id}>
                     {person.fullName} ({person.id})
