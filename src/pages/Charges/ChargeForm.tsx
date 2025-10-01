@@ -104,12 +104,15 @@ export default function ChargeForm() {
 
           <div>
             <label className="text-sm font-mono text-foreground mb-2 block">FACÇÃO</label>
-            <Select value={gangId} onValueChange={setGangId}>
+            <Select
+              value={gangId === "" ? "none" : gangId}
+              onValueChange={(value) => setGangId(value === "none" ? "" : value)}
+            >
               <SelectTrigger className="bg-input border-border">
                 <SelectValue placeholder="Selecione uma facção (opcional)" />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border z-50">
-                <SelectItem value="">Nenhuma</SelectItem>
+                <SelectItem value="none">Nenhuma</SelectItem>
                 {data.gangs.map((gang) => (
                   <SelectItem key={gang.id} value={gang.id}>
                     {gang.name}
