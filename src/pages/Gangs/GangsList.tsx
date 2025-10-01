@@ -140,6 +140,35 @@ export default function GangsList() {
                     <p className="text-center text-muted-foreground py-4">Nenhum membro registrado</p>
                   )}
                 </div>
+
+                {gang.alliedGangIds && gang.alliedGangIds.length > 0 && (
+                  <div className="border-t border-border pt-4 mt-4">
+                    <h4 className="text-sm font-mono text-accent mb-3">
+                      ALIANÇAS ({gang.alliedGangIds.length})
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {gang.alliedGangIds.map((alliedId) => {
+                        const alliedGang = data.gangs.find(g => g.id === alliedId);
+                        if (!alliedGang) return null;
+                        return (
+                          <div
+                            key={alliedId}
+                            className="flex items-center gap-2 px-3 py-1 bg-secondary rounded border border-border hover:border-primary transition-colors cursor-pointer"
+                            onClick={() => navigate(`/gangs/edit/${alliedId}`)}
+                          >
+                            {alliedGang.color && (
+                              <div
+                                className="w-4 h-4 rounded-full border border-border"
+                                style={{ backgroundColor: alliedGang.color }}
+                              />
+                            )}
+                            <span className="text-sm text-foreground font-mono">{alliedGang.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </Card>
             </motion.div>
           );

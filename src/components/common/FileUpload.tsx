@@ -42,13 +42,26 @@ export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, m
   };
 
   const handleAddUrl = () => {
-    if (!urlInput.trim()) return;
+    const trimmedUrl = urlInput.trim();
+    if (!trimmedUrl) return;
     
-    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(urlInput);
+    // Check if it's a valid URL
+    try {
+      new URL(trimmedUrl);
+    } catch {
+      // If not a valid URL, still allow it but warn
+      console.warn('URL may not be valid:', trimmedUrl);
+    }
+    
+    const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(trimmedUrl) || 
+                    trimmedUrl.includes('imgur.com') || 
+                    trimmedUrl.includes('cdn.') ||
+                    trimmedUrl.startsWith('data:image/');
+    
     onChange([...attachments, {
       id: `url-${Date.now()}`,
-      name: urlInput.split('/').pop() || 'URL',
-      url: urlInput,
+      name: trimmedUrl.split('/').pop() || 'URL Attachment',
+      url: trimmedUrl,
       type: isImage ? 'image/url' : 'application/url',
     }]);
     setUrlInput("");
