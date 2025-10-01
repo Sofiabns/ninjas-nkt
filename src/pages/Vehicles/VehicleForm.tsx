@@ -142,7 +142,7 @@ export default function VehicleForm() {
               </SelectTrigger>
               <SelectContent className="bg-popover border-border z-50">
                 <SelectItem value="">Nenhum</SelectItem>
-                {data.people.map((person) => (
+                {(data?.people ?? []).map((person) => (
                   <SelectItem key={person.id} value={person.id}>
                     {person.fullName} ({person.id})
                   </SelectItem>
