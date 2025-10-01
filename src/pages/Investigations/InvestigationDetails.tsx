@@ -118,28 +118,61 @@ export default function InvestigationDetails() {
             <Paperclip className="h-5 w-5" />
             ANEXOS ({investigation.attachments.length})
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {investigation.attachments.map((attachment, index) => (
-              <div
-                key={index}
-                className="bg-secondary rounded border border-border overflow-hidden"
-              >
-                {attachment.type === "image" ? (
-                  <img
-                    src={attachment.url}
-                    alt={attachment.name}
-                    className="w-full h-32 object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-32 flex items-center justify-center text-4xl text-muted-foreground">
-                    📄
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {investigation.attachments.map((attachment, index) => {
+              const isImage = attachment.type.startsWith("image/");
+              return (
+                <div
+                  key={index}
+                  className="bg-secondary rounded border border-border overflow-hidden group"
+                >
+                  <div className="relative">
+                    {isImage ? (
+                      <img
+                        src={attachment.url}
+                        alt={attachment.name}
+                        className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => window.open(attachment.url, '_blank')}
+                      />
+                    ) : (
+                      <div className="w-full h-48 flex items-center justify-center text-6xl text-muted-foreground bg-card">
+                        📄
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a
+                        href={attachment.url}
+                        download={attachment.name}
+                        className="p-2 bg-black/60 rounded hover:bg-black/80"
+                        title="Baixar"
+                      >
+                        <Paperclip className="h-4 w-4 text-white" />
+                      </a>
+                      <a
+                        href={attachment.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 bg-black/60 rounded hover:bg-black/80"
+                        title="Abrir"
+                      >
+                        <span className="text-white text-xs">Abrir</span>
+                      </a>
+                    </div>
                   </div>
-                )}
-                <div className="p-2">
-                  <p className="text-xs text-foreground truncate">{attachment.name}</p>
+                  <div className="p-3">
+                    <p className="text-xs text-foreground truncate font-mono">{attachment.name}</p>
+                    {isImage && (
+                      <button
+                        onClick={() => window.open(attachment.url, '_blank')}
+                        className="text-xs text-accent hover:text-primary mt-1"
+                      >
+                        Ver imagem completa
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       )}

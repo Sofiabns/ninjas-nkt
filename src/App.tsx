@@ -26,6 +26,7 @@ import ChargesList from "./pages/Charges/ChargesList";
 import ChargeForm from "./pages/Charges/ChargeForm";
 import GangsList from "./pages/Gangs/GangsList";
 import GangForm from "./pages/Gangs/GangForm";
+import GangDetails from "./pages/Gangs/GangDetails";
 import MeetingsList from "./pages/Meetings/MeetingsList";
 import MeetingForm from "./pages/Meetings/MeetingForm";
 import MeetingDetails from "./pages/Meetings/MeetingDetails";
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/gangs" element={<GangsList />} />
               <Route path="/gangs/new" element={<GangForm />} />
               <Route path="/gangs/edit/:id" element={<GangForm />} />
+              <Route path="/gangs/:id" element={<GangDetails />} />
               <Route path="/meetings" element={<MeetingsList />} />
               <Route path="/meetings/new" element={<MeetingForm />} />
               <Route path="/meetings/edit/:id" element={<MeetingForm />} />

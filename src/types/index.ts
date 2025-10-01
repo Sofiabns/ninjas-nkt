@@ -29,6 +29,7 @@ export interface Gang {
   name: string;
   description: string;
   color?: string;
+  alliedGangIds?: string[];
   createdAt: string;
 }
 

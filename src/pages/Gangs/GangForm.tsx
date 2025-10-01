@@ -11,11 +11,12 @@ import { toast } from "sonner";
 export default function GangForm() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { addGang, updateGang, getGang } = useApp();
+  const { data, addGang, updateGang, getGang } = useApp();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("#00ff00");
+  const [alliedGangIds, setAlliedGangIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -24,6 +25,7 @@ export default function GangForm() {
         setName(gang.name);
         setDescription(gang.description);
         setColor(gang.color || "#00ff00");
+        setAlliedGangIds(gang.alliedGangIds || []);
       }
     }
   }, [id]);
@@ -36,10 +38,10 @@ export default function GangForm() {
     }
 
     if (id) {
-      updateGang(id, { name, description, color });
+      updateGang(id, { name, description, color, alliedGangIds });
       toast.success("Facção atualizada");
     } else {
-      addGang({ name, description, color });
+      addGang({ name, description, color, alliedGangIds });
       toast.success("Facção criada");
     }
     navigate("/gangs");
@@ -93,6 +95,31 @@ export default function GangForm() {
                 placeholder="#00ff00"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">ALIANÇAS (OPCIONAL)</label>
+            <p className="text-xs text-muted-foreground mb-2">Selecione facções aliadas</p>
+            {data.gangs.filter(g => g.id !== id).map((gang) => (
+              <div key={gang.id} className="flex items-center gap-2 mb-2">
+                <input
+                  type="checkbox"
+                  id={`ally-${gang.id}`}
+                  checked={alliedGangIds.includes(gang.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setAlliedGangIds([...alliedGangIds, gang.id]);
+                    } else {
+                      setAlliedGangIds(alliedGangIds.filter(id => id !== gang.id));
+                    }
+                  }}
+                  className="w-4 h-4"
+                />
+                <label htmlFor={`ally-${gang.id}`} className="text-sm text-foreground cursor-pointer">
+                  {gang.name}
+                </label>
+              </div>
+            ))}
           </div>
 
           <div className="flex gap-3 pt-4">
