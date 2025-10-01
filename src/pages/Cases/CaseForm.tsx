@@ -7,7 +7,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/common/FileUpload";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
-import { createCase, updateCase as updateCaseFB, getCaseById } from "@/services/casesService";
 import { Attachment } from "@/types";
 import { toast } from "sonner";
 import { X } from "lucide-react";
@@ -38,52 +37,39 @@ export default function CaseForm() {
         setGangIds(caseData.gangIds);
         setAttachments(caseData.attachments);
       }
-
-      (async () => {
-        const fbCase = await getCaseById(id);
-        if (fbCase) {
-          setTitle(fbCase.title || "");
-          setDescription(fbCase.description || "");
-          setPersonIds(fbCase.personIds || []);
-          setVehicleIds(fbCase.vehicleIds || []);
-          setGangIds(fbCase.gangIds || []);
-          setAttachments(fbCase.attachments || []);
-        }
-      })();
     }
   }, [id]);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!title.trim() || !description.trim()) {
-    toast.error("Preencha os campos obrigatórios");
-    return;
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim() || !description.trim()) {
+      toast.error("Preencha os campos obrigatórios");
+      return;
+    }
 
-  if (id) {
-    updateCase(id, { title, description, personIds, vehicleIds, gangIds, attachments });
-    await updateCaseFB(id, { title, description, personIds, vehicleIds, gangIds, attachments }); // Firebase
-    toast.success("Caso atualizado");
-  } else {
-    addCase({ title, description, personIds, vehicleIds, gangIds, attachments });
-    await createCase({ title, description, personIds, vehicleIds, gangIds, attachments }); // Firebase
-    toast.success("Caso criado");
-  }
-};
+    if (id) {
+      updateCase(id, { title, description, personIds, vehicleIds, gangIds, attachments });
+      toast.success("Caso atualizado");
+    } else {
+      addCase({ title, description, personIds, vehicleIds, gangIds, attachments });
+      toast.success("Caso criado");
+    }
+    navigate("/cases/active");
+  };
 
-const filteredPeople = data.people.filter(
-  (p) =>
-    !personIds.includes(p.id) &&
-    (p.fullName.toLowerCase().includes(personSearch.toLowerCase()) ||
-      p.id.toLowerCase().includes(personSearch.toLowerCase()))
-);
+  const filteredPeople = data.people.filter(
+    (p) =>
+      !personIds.includes(p.id) &&
+      (p.fullName.toLowerCase().includes(personSearch.toLowerCase()) ||
+        p.id.toLowerCase().includes(personSearch.toLowerCase()))
+  );
 
-const filteredVehicles = data.vehicles.filter(
-  (v) =>
-    !vehicleIds.includes(v.id) &&
-    (v.plate.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
-      v.model.toLowerCase().includes(vehicleSearch.toLowerCase()))
-);
+  const filteredVehicles = data.vehicles.filter(
+    (v) =>
+      !vehicleIds.includes(v.id) &&
+      (v.plate.toLowerCase().includes(vehicleSearch.toLowerCase()) ||
+        v.model.toLowerCase().includes(vehicleSearch.toLowerCase()))
+  );
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

@@ -8,9 +8,6 @@ import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-import { closeCaseFB, deleteCaseFB } from "@/services/casesService";
-
-
 export default function ArchivedCases() {
   const { data, deleteCase } = useApp();
   const navigate = useNavigate();
@@ -24,14 +21,12 @@ export default function ArchivedCases() {
       c.id.toLowerCase().includes(search.toLowerCase())
   );
 
-const handleDelete = async (id: string) => {
-  if (confirm("Tem certeza que deseja deletar este caso arquivado?")) {
-    deleteCase(id);        // local
-    await deleteCaseFB(id); // 🔹 Firebase
-    toast.success("Caso deletado");
-  }
-};
-
+  const handleDelete = (id: string) => {
+    if (confirm("Tem certeza que deseja deletar este caso arquivado?")) {
+      deleteCase(id);
+      toast.success("Caso deletado");
+    }
+  };
 
   return (
     <div className="space-y-6">
