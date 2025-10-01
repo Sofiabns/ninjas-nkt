@@ -154,7 +154,7 @@ export default function GangsList() {
                           <div
                             key={alliedId}
                             className="flex items-center gap-2 px-3 py-1 bg-secondary rounded border border-border hover:border-primary transition-colors cursor-pointer"
-                            onClick={() => navigate(`/gangs/edit/${alliedId}`)}
+                            onClick={() => navigate(`/gangs/${alliedId}`)}
                           >
                             {alliedGang.color && (
                               <div

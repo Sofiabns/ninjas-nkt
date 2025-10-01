@@ -139,14 +139,25 @@ export default function InvestigationDetails() {
                         📄
                       </div>
                     )}
-                    <a
-                      href={attachment.url}
-                      download={attachment.name}
-                      className="absolute top-2 right-2 p-2 bg-black/60 rounded hover:bg-black/80 transition-colors opacity-0 group-hover:opacity-100"
-                      title="Download"
-                    >
-                      <Paperclip className="h-4 w-4 text-white" />
-                    </a>
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a
+                        href={attachment.url}
+                        download={attachment.name}
+                        className="p-2 bg-black/60 rounded hover:bg-black/80"
+                        title="Baixar"
+                      >
+                        <Paperclip className="h-4 w-4 text-white" />
+                      </a>
+                      <a
+                        href={attachment.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 bg-black/60 rounded hover:bg-black/80"
+                        title="Abrir"
+                      >
+                        <span className="text-white text-xs">Abrir</span>
+                      </a>
+                    </div>
                   </div>
                   <div className="p-3">
                     <p className="text-xs text-foreground truncate font-mono">{attachment.name}</p>
