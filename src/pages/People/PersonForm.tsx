@@ -3,16 +3,17 @@ import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { formatPhone, validatePhone, fileToDataUrl } from "@/utils/validation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload } from "lucide-react";
-import { getPerson, addOrUpdatePerson, uploadPersonPhoto, Person } from "../../services/PeopleService";
 
 export default function PersonForm() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { data, addPerson, updatePerson, getPerson } = useApp();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState("");
@@ -21,20 +22,18 @@ export default function PersonForm() {
   const [phone, setPhone] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (id) {
-      getPerson(id).then((person) => {
-        if (person) {
-          setFullName(person.fullName);
-          setGang(person.gang);
-          setHierarchy(person.hierarchy);
-          setPhone(person.phone);
-          setPhotoUrl(person.photoUrl || "");
-          setVehicleIds(person.vehicleIds || []);
-        }
-      });
+      const person = getPerson(id);
+      if (person) {
+        setFullName(person.fullName);
+        setGang(person.gang);
+        setHierarchy(person.hierarchy);
+        setPhone(person.phone);
+        setPhotoUrl(person.photoUrl || "");
+        setVehicleIds(person.vehicleIds);
+      }
     }
   }, [id]);
 
@@ -42,15 +41,15 @@ export default function PersonForm() {
     setPhone(formatPhone(value));
   };
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPhotoFile(file);
-      fileToDataUrl(file).then(setPhotoUrl);
+      const dataUrl = await fileToDataUrl(file);
+      setPhotoUrl(dataUrl);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !gang || !phone) {
       toast.error("Preencha os campos obrigatórios");
@@ -62,32 +61,14 @@ export default function PersonForm() {
       return;
     }
 
-    try {
-      let finalPhotoUrl = photoUrl;
-      const personId = id || crypto.randomUUID();
-
-      if (photoFile) {
-        finalPhotoUrl = await uploadPersonPhoto(photoFile, personId);
-      }
-
-      const person: Person = {
-        id: personId,
-        fullName,
-        gang,
-        hierarchy,
-        phone,
-        photoUrl: finalPhotoUrl,
-        vehicleIds,
-      };
-
-      await addOrUpdatePerson(person);
-
-      toast.success(id ? "Pessoa atualizada" : "Pessoa registrada");
-      navigate("/people");
-    } catch (error) {
-      toast.error("Erro ao salvar pessoa");
-      console.error(error);
+    if (id) {
+      updatePerson(id, { fullName, gang, hierarchy, phone, photoUrl, vehicleIds });
+      toast.success("Pessoa atualizada");
+    } else {
+      addPerson({ fullName, gang, hierarchy, phone, photoUrl, vehicleIds });
+      toast.success("Pessoa registrada");
     }
+    navigate("/people");
   };
 
   return (
@@ -148,9 +129,11 @@ export default function PersonForm() {
                 <SelectValue placeholder="Selecione uma facção" />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border z-50">
-                {/* Ideal: carregar facções do Firestore */}
-                <SelectItem value="Facção A">Facção A</SelectItem>
-                <SelectItem value="Facção B">Facção B</SelectItem>
+                {data.gangs.map((g) => (
+                  <SelectItem key={g.id} value={g.name}>
+                    {g.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

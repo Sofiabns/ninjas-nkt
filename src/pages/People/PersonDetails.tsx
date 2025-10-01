@@ -1,107 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Edit, FolderOpen } from "lucide-react";
 
-import { db } from "../../services/firebase";
-import {
-  doc,
-  getDoc,
-  collection,
-  query,
-  where,
-  onSnapshot,
-  DocumentData,
-} from "firebase/firestore";
-
-interface Person {
-  id: string;
-  fullName: string;
-  gang: string;
-  hierarchy: string;
-  phone: string;
-  photoUrl?: string;
-  vehicleIds: string[];
-}
-
-interface Case {
-  id: string;
-  title: string;
-  status: "open" | "closed";
-  personIds: string[];
-}
-
-interface Vehicle {
-  id: string;
-  plate: string;
-  model: string;
-}
-
 export default function PersonDetails() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
+  const { getPerson, data, getVehicle } = useApp();
 
-  const [person, setPerson] = useState<Person | null>(null);
-  const [personCases, setPersonCases] = useState<Case[]>([]);
-  const [personVehicles, setPersonVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!id) return;
-
-    // Buscar pessoa
-    const personRef = doc(db, "people", id);
-    getDoc(personRef).then((docSnap) => {
-      if (docSnap.exists()) {
-        setPerson({ id: docSnap.id, ...(docSnap.data() as Person) });
-      } else {
-        setPerson(null);
-      }
-      setLoading(false);
-    });
-  }, [id]);
-
-  useEffect(() => {
-    if (!person) return;
-
-    // Escutar casos que envolvem essa pessoa
-    const casesRef = collection(db, "cases");
-    const q = query(casesRef, where("personIds", "array-contains", person.id));
-    const unsubscribeCases = onSnapshot(q, (snapshot) => {
-      const casesData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Case),
-      }));
-      setPersonCases(casesData);
-    });
-
-    // Escutar veículos associados
-    if (person.vehicleIds && person.vehicleIds.length > 0) {
-      const vehiclesRef = collection(db, "vehicles");
-      // Para buscar múltiplos veículos por id, pode-se usar múltiplos getDoc ou um query com where in (máximo 10 ids)
-      // Aqui vamos buscar individualmente para simplicidade
-      Promise.all(
-        person.vehicleIds.map(async (vid) => {
-          const vDoc = await getDoc(doc(vehiclesRef, vid));
-          return vDoc.exists() ? ({ id: vDoc.id, ...(vDoc.data() as Vehicle) }) : null;
-        })
-      ).then((vehicles) => {
-        setPersonVehicles(vehicles.filter(Boolean) as Vehicle[]);
-      });
-    } else {
-      setPersonVehicles([]);
-    }
-
-    return () => {
-      unsubscribeCases();
-    };
-  }, [person]);
-
-  if (loading) {
-    return <p className="text-center py-12">Carregando...</p>;
-  }
+  const person = getPerson(id!);
 
   if (!person) {
     return (
@@ -113,6 +23,9 @@ export default function PersonDetails() {
       </div>
     );
   }
+
+  const personCases = data.cases.filter((c) => c.personIds.includes(person.id));
+  const personVehicles = person.vehicleIds.map((vid) => getVehicle(vid)).filter(Boolean);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -175,35 +88,37 @@ export default function PersonDetails() {
             </h2>
 
             <div className="space-y-3">
-              {personCases.length > 0 ? (
-                personCases.map((caseItem) => (
-                  <div
-                    key={caseItem.id}
-                    className="p-3 bg-secondary rounded border border-border cursor-pointer hover:border-primary transition-colors"
-                    onClick={() => navigate(`/cases/${caseItem.id}`)}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <p className="font-mono text-sm text-accent">{caseItem.id}</p>
-                        <p className="font-bold text-foreground">{caseItem.title}</p>
-                      </div>
-                      <span
-                        className={`text-xs px-2 py-1 rounded ${
-                          caseItem.status === "open"
-                            ? "bg-primary/20 text-primary"
-                            : "bg-muted text-muted-foreground"
-                        }`}
-                      >
-                        {caseItem.status === "open" ? "ATIVO" : "FECHADO"}
-                      </span>
+              {personCases.map((caseItem) => (
+                <div
+                  key={caseItem.id}
+                  className="p-3 bg-secondary rounded border border-border cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => navigate(`/cases/${caseItem.id}`)}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <p className="font-mono text-sm text-accent">{caseItem.id}</p>
+                      <p className="font-bold text-foreground">{caseItem.title}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Envolvido: {person.fullName} ({person.id})
-                    </p>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        caseItem.status === "open"
+                          ? "bg-primary/20 text-primary"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {caseItem.status === "open" ? "ATIVO" : "FECHADO"}
+                    </span>
                   </div>
-                ))
-              ) : (
-                <p className="text-center text-muted-foreground py-4">Nenhum caso registrado</p>
+                  <p className="text-xs text-muted-foreground">
+                    Envolvido: {person.fullName} ({person.id})
+                  </p>
+                </div>
+              ))}
+
+              {personCases.length === 0 && (
+                <p className="text-center text-muted-foreground py-4">
+                  Nenhum caso registrado
+                </p>
               )}
             </div>
           </Card>
@@ -213,9 +128,9 @@ export default function PersonDetails() {
               <h2 className="text-xl font-bold text-primary mb-4">VEÍCULOS ASSOCIADOS</h2>
               <div className="space-y-2">
                 {personVehicles.map((vehicle) => (
-                  <div key={vehicle.id} className="p-3 bg-secondary rounded border border-border">
-                    <p className="font-mono text-foreground">{vehicle.plate}</p>
-                    <p className="text-sm text-muted-foreground">{vehicle.model}</p>
+                  <div key={vehicle!.id} className="p-3 bg-secondary rounded border border-border">
+                    <p className="font-mono text-foreground">{vehicle!.plate}</p>
+                    <p className="text-sm text-muted-foreground">{vehicle!.model}</p>
                   </div>
                 ))}
               </div>

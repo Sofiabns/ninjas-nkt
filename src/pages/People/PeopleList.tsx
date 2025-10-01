@@ -1,27 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { subscribePeople, deletePerson, Person } from "../../services/PeopleService";
 import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useApp } from "@/contexts/AppContext";
 import { SearchInput } from "@/components/common/SearchInput";
+import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function PeopleList() {
-  const [people, setPeople] = useState<Person[]>([]);
+  const { data, deletePerson } = useApp();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [gangFilter, setGangFilter] = useState<string>("all");
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const unsubscribe = subscribePeople(setPeople);
-    return () => unsubscribe();
-  }, []);
-
-  let filtered = people.filter(
+  let filtered = data.people.filter(
     (p) =>
       p.fullName.toLowerCase().includes(search.toLowerCase()) ||
       p.id.toLowerCase().includes(search.toLowerCase()) ||
@@ -32,15 +26,10 @@ export default function PeopleList() {
     filtered = filtered.filter((p) => p.gang === gangFilter);
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (confirm("Tem certeza que deseja deletar esta pessoa?")) {
-      try {
-        await deletePerson(id);
-        toast.success("Pessoa deletada");
-      } catch (error) {
-        toast.error("Erro ao deletar pessoa");
-        console.error(error);
-      }
+      deletePerson(id);
+      toast.success("Pessoa deletada");
     }
   };
 
@@ -80,10 +69,11 @@ export default function PeopleList() {
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
             <SelectItem value="all">Todas as facções</SelectItem>
-            {/* Você pode carregar as facções do Firestore também */}
-            {/* Exemplo estático: */}
-            <SelectItem value="Facção A">Facção A</SelectItem>
-            <SelectItem value="Facção B">Facção B</SelectItem>
+            {data.gangs.map((gang) => (
+              <SelectItem key={gang.id} value={gang.name}>
+                {gang.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
