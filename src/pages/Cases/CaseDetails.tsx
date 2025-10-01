@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,28 @@ import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Edit, Users, Car, Users2, Paperclip } from "lucide-react";
 
+
+import { getCaseById } from "@/services/casesService";
+
 export default function CaseDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { getCase, getPerson, getVehicle, getGang } = useApp();
 
-  const caseData = getCase(id!);
+  const [caseData, setCaseData] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      (async () => {
+        const fbCase = await getCaseById(id);
+        if (fbCase) {
+          setCaseData(fbCase);
+        } else {
+          setCaseData(getCase(id)); // fallback no contexto
+        }
+      })();
+    }
+  }, [id, getCase]);
 
   if (!caseData) {
     return (
@@ -23,7 +39,7 @@ export default function CaseDetails() {
       </div>
     );
   }
-
+  
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <motion.div

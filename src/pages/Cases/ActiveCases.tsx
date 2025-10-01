@@ -31,21 +31,26 @@ export default function ActiveCases() {
       c.id.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleClose = () => {
-    if (closingCase && closeReason.trim()) {
-      closeCase(closingCase, closeReason);
-      toast.success("Caso fechado com sucesso");
-      setClosingCase(null);
-      setCloseReason("");
-    }
-  };
+const handleClose = async () => {
+  if (closingCase && closeReason.trim()) {
+    closeCase(closingCase, closeReason);         // local
+    await closeCase(closingCase, closeReason); // 🔹 Firebase
+    toast.success("Caso fechado com sucesso");
+    setClosingCase(null);
+    setCloseReason("");
+  }
+};
 
-  const handleDelete = (id: string) => {
-    if (confirm("Tem certeza que deseja deletar este caso?")) {
-      deleteCase(id);
-      toast.success("Caso deletado");
-    }
-  };
+
+
+const handleDelete = async (id: string) => {
+  if (confirm("Tem certeza que deseja deletar este caso?")) {
+    deleteCase(id);        // local
+    await deleteCase(id); // 🔹 Firebase
+    toast.success("Caso deletado");
+  }
+};
+
 
   return (
     <div className="space-y-6">
