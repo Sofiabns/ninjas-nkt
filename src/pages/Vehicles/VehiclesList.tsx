@@ -27,6 +27,10 @@ export default function VehiclesList() {
     }
   };
 
+  if (!data?.vehicles) {
+    return <div className="text-center py-10">Nenhum veículo encontrado.</div>;
+  }
+
   return (
     <div className="space-y-6">
       <motion.div
