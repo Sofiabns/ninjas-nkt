@@ -141,6 +141,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("V", data.vehicles.map((v) => v.id));
     const newVehicle: Vehicle = { ...vehicle, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, vehicles: [...prev.vehicles, newVehicle] }));
+    addActivityLog("Adicionou veículo", "Vehicle", id);
   };
 
   const updateVehicle = (id: string, vehicle: Partial<Vehicle>) => {
@@ -148,10 +149,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       vehicles: prev.vehicles.map((v) => (v.id === id ? { ...v, ...vehicle } : v)),
     }));
+    addActivityLog("Atualizou veículo", "Vehicle", id);
   };
 
   const deleteVehicle = (id: string) => {
     setData((prev) => ({ ...prev, vehicles: prev.vehicles.filter((v) => v.id !== id) }));
+    addActivityLog("Deletou veículo", "Vehicle", id);
   };
 
   const getVehicle = (id: string) => data.vehicles.find((v) => v.id === id);
@@ -161,6 +164,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("G", data.gangs.map((g) => g.id));
     const newGang: Gang = { ...gang, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, gangs: [...prev.gangs, newGang] }));
+    addActivityLog("Adicionou facção", "Gang", id);
   };
 
   const updateGang = (id: string, gang: Partial<Gang>) => {
@@ -168,10 +172,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       gangs: prev.gangs.map((g) => (g.id === id ? { ...g, ...gang } : g)),
     }));
+    addActivityLog("Atualizou facção", "Gang", id);
   };
 
   const deleteGang = (id: string) => {
     setData((prev) => ({ ...prev, gangs: prev.gangs.filter((g) => g.id !== id) }));
+    addActivityLog("Deletou facção", "Gang", id);
   };
 
   const getGang = (id: string) => data.gangs.find((g) => g.id === id);
@@ -213,6 +219,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("I", data.investigations.map((i) => i.id));
     const newInvestigation: Investigation = { ...investigation, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, investigations: [...prev.investigations, newInvestigation] }));
+    addActivityLog("Criou investigação", "Investigation", id);
   };
 
   const updateInvestigation = (id: string, investigation: Partial<Investigation>) => {
@@ -220,10 +227,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       investigations: prev.investigations.map((i) => (i.id === id ? { ...i, ...investigation } : i)),
     }));
+    addActivityLog("Atualizou investigação", "Investigation", id);
   };
 
   const deleteInvestigation = (id: string) => {
     setData((prev) => ({ ...prev, investigations: prev.investigations.filter((i) => i.id !== id) }));
+    addActivityLog("Deletou investigação", "Investigation", id);
   };
 
   const getInvestigation = (id: string) => data.investigations.find((i) => i.id === id);
@@ -233,6 +242,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("CH", data.charges.map((c) => c.id));
     const newCharge: Charge = { ...charge, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, charges: [...prev.charges, newCharge] }));
+    addActivityLog("Adicionou cobrança", "Charge", id);
   };
 
   const updateCharge = (id: string, charge: Partial<Charge>) => {
@@ -240,10 +250,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       charges: prev.charges.map((c) => (c.id === id ? { ...c, ...charge } : c)),
     }));
+    addActivityLog("Atualizou cobrança", "Charge", id);
   };
 
   const deleteCharge = (id: string) => {
     setData((prev) => ({ ...prev, charges: prev.charges.filter((c) => c.id !== id) }));
+    addActivityLog("Deletou cobrança", "Charge", id);
   };
 
   // Bases methods
@@ -251,6 +263,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("B", data.bases.map((b) => b.id));
     const newBase: Base = { ...base, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, bases: [...prev.bases, newBase] }));
+    addActivityLog("Adicionou base", "Base", id);
   };
 
   const updateBase = (id: string, base: Partial<Base>) => {
@@ -258,10 +271,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       bases: prev.bases.map((b) => (b.id === id ? { ...b, ...base } : b)),
     }));
+    addActivityLog("Atualizou base", "Base", id);
   };
 
   const deleteBase = (id: string) => {
     setData((prev) => ({ ...prev, bases: prev.bases.filter((b) => b.id !== id) }));
+    addActivityLog("Deletou base", "Base", id);
   };
 
   // Meetings methods
@@ -269,6 +284,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("M", data.meetings.map((m) => m.id));
     const newMeeting: Meeting = { ...meeting, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, meetings: [...prev.meetings, newMeeting] }));
+    addActivityLog("Criou reunião", "Meeting", id);
   };
 
   const updateMeeting = (id: string, meeting: Partial<Meeting>) => {
@@ -276,10 +292,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       meetings: prev.meetings.map((m) => (m.id === id ? { ...m, ...meeting } : m)),
     }));
+    addActivityLog("Atualizou reunião", "Meeting", id);
   };
 
   const deleteMeeting = (id: string) => {
     setData((prev) => ({ ...prev, meetings: prev.meetings.filter((m) => m.id !== id) }));
+    addActivityLog("Deletou reunião", "Meeting", id);
   };
 
   // Deeps methods
@@ -287,6 +305,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("D", data.deeps.map((d) => d.id));
     const newDeep: Deep = { ...deep, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, deeps: [...prev.deeps, newDeep] }));
+    addActivityLog("Criou deep", "Deep", id);
   };
 
   const updateDeep = (id: string, deep: Partial<Deep>) => {
@@ -294,10 +313,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       deeps: prev.deeps.map((d) => (d.id === id ? { ...d, ...deep } : d)),
     }));
+    addActivityLog("Atualizou deep", "Deep", id);
   };
 
   const deleteDeep = (id: string) => {
     setData((prev) => ({ ...prev, deeps: prev.deeps.filter((d) => d.id !== id) }));
+    addActivityLog("Deletou deep", "Deep", id);
   };
 
   // Auctions methods
@@ -305,6 +326,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const id = generateId("A", data.auctions.map((a) => a.id));
     const newAuction: Auction = { ...auction, id, createdAt: new Date().toISOString() };
     setData((prev) => ({ ...prev, auctions: [...prev.auctions, newAuction] }));
+    addActivityLog("Criou leilão", "Auction", id);
   };
 
   const updateAuction = (id: string, auction: Partial<Auction>) => {
@@ -312,10 +334,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       ...prev,
       auctions: prev.auctions.map((a) => (a.id === id ? { ...a, ...auction } : a)),
     }));
+    addActivityLog("Atualizou leilão", "Auction", id);
   };
 
   const deleteAuction = (id: string) => {
     setData((prev) => ({ ...prev, auctions: prev.auctions.filter((a) => a.id !== id) }));
+    addActivityLog("Deletou leilão", "Auction", id);
   };
 
   // Investigators methods

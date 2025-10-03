@@ -36,6 +36,7 @@ import DeepDetails from "./pages/Deeps/DeepDetails";
 import AuctionsList from "./pages/Auctions/AuctionsList";
 import AuctionForm from "./pages/Auctions/AuctionForm";
 import AuctionDetails from "./pages/Auctions/AuctionDetails";
+import GlobalSearch from "./pages/GlobalSearch";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ function App() {
               <Route path="/" element={<Login />} />
               <Route element={<MainLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/search" element={<GlobalSearch />} />
                 <Route path="/cases/active" element={<ActiveCases />} />
                 <Route path="/cases/archived" element={<ArchivedCases />} />
                 <Route path="/cases/new" element={<CaseForm />} />

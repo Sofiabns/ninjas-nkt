@@ -18,6 +18,7 @@ import { useApp } from "@/contexts/AppContext";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "DASHBOARD", path: "/dashboard" },
+  { icon: Search, label: "PESQUISA GLOBAL", path: "/search" },
   { icon: FolderOpen, label: "CASOS ATIVOS", path: "/cases/active" },
   { icon: Search, label: "INVESTIGAÇÕES", path: "/investigations" },
   { icon: Users, label: "REGISTRO PESSOAS", path: "/people" },
