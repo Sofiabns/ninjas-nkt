@@ -1,0 +1,150 @@
+-- ============================================
+-- SQL para configurar o banco de dados Supabase
+-- Execute este script no SQL Editor do Supabase
+-- ============================================
+
+-- Investigators table
+CREATE TABLE IF NOT EXISTS investigators (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  photo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- People table
+CREATE TABLE IF NOT EXISTS people (
+  id TEXT PRIMARY KEY,
+  full_name TEXT NOT NULL,
+  gang TEXT NOT NULL,
+  hierarchy TEXT NOT NULL CHECK (hierarchy IN ('Líder', 'Sub-Líder', 'Membro')),
+  phone TEXT NOT NULL,
+  photo_url TEXT,
+  vehicle_ids TEXT[] DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Vehicles table
+CREATE TABLE IF NOT EXISTS vehicles (
+  id TEXT PRIMARY KEY,
+  plate TEXT NOT NULL,
+  model TEXT NOT NULL,
+  photo_url TEXT,
+  owner_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Gangs table
+CREATE TABLE IF NOT EXISTS gangs (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  color TEXT,
+  allied_gang_ids TEXT[] DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Cases table
+CREATE TABLE IF NOT EXISTS cases (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  person_ids TEXT[] DEFAULT '{}',
+  vehicle_ids TEXT[] DEFAULT '{}',
+  gang_ids TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
+  status TEXT NOT NULL CHECK (status IN ('open', 'closed')),
+  closed_reason TEXT,
+  closed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Investigations table
+CREATE TABLE IF NOT EXISTS investigations (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  sections JSONB DEFAULT '[]',
+  person_ids TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Charges table
+CREATE TABLE IF NOT EXISTS charges (
+  id TEXT PRIMARY KEY,
+  person_ids TEXT[] DEFAULT '{}',
+  vehicle_ids TEXT[] DEFAULT '{}',
+  gang_id TEXT,
+  reason TEXT NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('pendente', 'resolvido')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Bases table
+CREATE TABLE IF NOT EXISTS bases (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  images TEXT[] DEFAULT '{}',
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Meetings table
+CREATE TABLE IF NOT EXISTS meetings (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  person_ids TEXT[] DEFAULT '{}',
+  vehicle_ids TEXT[] DEFAULT '{}',
+  gang_ids TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
+  meeting_date TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Deeps table
+CREATE TABLE IF NOT EXISTS deeps (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  images TEXT[] DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Auctions table
+CREATE TABLE IF NOT EXISTS auctions (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  entries JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Activity logs table
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id TEXT PRIMARY KEY,
+  investigator_id TEXT NOT NULL,
+  investigator_name TEXT NOT NULL,
+  action TEXT NOT NULL,
+  entity_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  timestamp TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_people_gang ON people(gang);
+CREATE INDEX IF NOT EXISTS idx_vehicles_owner ON vehicles(owner_id);
+CREATE INDEX IF NOT EXISTS idx_cases_status ON cases(status);
+CREATE INDEX IF NOT EXISTS idx_charges_status ON charges(status);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_investigator ON activity_logs(investigator_id);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_timestamp ON activity_logs(timestamp DESC);
+
+-- Inserir investigadores padrão
+INSERT INTO investigators (id, name) VALUES
+  ('INV-01', 'Hinata'),
+  ('INV-02', 'Luciano'),
+  ('INV-03', 'Miranda'),
+  ('INV-04', 'Lua'),
+  ('INV-05', 'Hiro'),
+  ('INV-06', 'Eloa'),
+  ('INV-07', 'Lara')
+ON CONFLICT (id) DO NOTHING;
