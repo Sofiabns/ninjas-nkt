@@ -78,7 +78,15 @@ const AppContext = createContext<AppContextType | null>(null);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<AppData>({
-    investigators: [],
+    investigators: [
+      { id: "INV-01", name: "Hinata" },
+      { id: "INV-02", name: "Luciano" },
+      { id: "INV-03", name: "Miranda" },
+      { id: "INV-04", name: "Lua" },
+      { id: "INV-05", name: "Hiro" },
+      { id: "INV-06", name: "Eloa" },
+      { id: "INV-07", name: "Lara" },
+    ],
     people: [],
     vehicles: [],
     gangs: [],
@@ -126,113 +134,119 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           supabase.from('activity_logs').select('*').order('timestamp', { ascending: false }).limit(100)
         ]);
 
-        setData({
-          investigators: investigatorsRes.data?.map(inv => ({
-            id: inv.id,
-            name: inv.name,
-            photoUrl: inv.photo_url
-          })) || [],
-          people: peopleRes.data?.map(p => ({
-            id: p.id,
-            fullName: p.full_name,
-            gang: p.gang,
-            hierarchy: p.hierarchy as "Líder" | "Sub-Líder" | "Membro",
-            phone: p.phone,
-            photoUrl: p.photo_url,
-            vehicleIds: p.vehicle_ids || [],
-            createdAt: p.created_at
-          })) || [],
-          vehicles: vehiclesRes.data?.map(v => ({
-            id: v.id,
-            plate: v.plate,
-            model: v.model,
-            photoUrl: v.photo_url,
-            ownerId: v.owner_id,
-            createdAt: v.created_at
-          })) || [],
-          gangs: gangsRes.data?.map(g => ({
-            id: g.id,
-            name: g.name,
-            description: g.description,
-            color: g.color,
-            alliedGangIds: g.allied_gang_ids || [],
-            createdAt: g.created_at
-          })) || [],
-          cases: casesRes.data?.map(c => ({
-            id: c.id,
-            title: c.title,
-            description: c.description,
-            personIds: c.person_ids || [],
-            vehicleIds: c.vehicle_ids || [],
-            gangIds: c.gang_ids || [],
-            attachments: c.attachments || [],
-            status: c.status as "open" | "closed",
-            closedReason: c.closed_reason,
-            closedAt: c.closed_at,
-            createdAt: c.created_at
-          })) || [],
-          investigations: investigationsRes.data?.map(i => ({
-            id: i.id,
-            title: i.title,
-            sections: i.sections || [],
-            personIds: i.person_ids || [],
-            attachments: i.attachments || [],
-            createdAt: i.created_at
-          })) || [],
-          charges: chargesRes.data?.map(ch => ({
-            id: ch.id,
-            personIds: ch.person_ids || [],
-            vehicleIds: ch.vehicle_ids || [],
-            gangId: ch.gang_id,
-            reason: ch.reason,
-            status: ch.status as "pendente" | "resolvido",
-            createdAt: ch.created_at
-          })) || [],
-          bases: basesRes.data?.map(b => ({
-            id: b.id,
-            name: b.name,
-            description: b.description,
-            images: b.images || [],
-            metadata: b.metadata || {},
-            createdAt: b.created_at
-          })) || [],
-          meetings: meetingsRes.data?.map(m => ({
-            id: m.id,
-            title: m.title,
-            description: m.description,
-            personIds: m.person_ids || [],
-            vehicleIds: m.vehicle_ids || [],
-            gangIds: m.gang_ids || [],
-            attachments: m.attachments || [],
-            meetingDate: m.meeting_date,
-            createdAt: m.created_at
-          })) || [],
-          deeps: deepsRes.data?.map(d => ({
-            id: d.id,
-            title: d.title,
-            description: d.description,
-            images: d.images || [],
-            createdAt: d.created_at
-          })) || [],
-          auctions: auctionsRes.data?.map(a => ({
-            id: a.id,
-            title: a.title,
-            entries: a.entries || [],
-            createdAt: a.created_at
-          })) || [],
-          activityLogs: logsRes.data?.map(log => ({
-            id: log.id,
-            investigatorId: log.investigator_id,
-            investigatorName: log.investigator_name,
-            action: log.action,
-            entityType: log.entity_type,
-            entityId: log.entity_id,
-            timestamp: log.timestamp
-          })) || []
-        });
+        // Só atualiza se conseguiu conectar (tabelas existem)
+        const hasData = investigatorsRes.data || peopleRes.data || vehiclesRes.data;
+        
+        if (hasData) {
+          setData({
+            investigators: investigatorsRes.data?.map(inv => ({
+              id: inv.id,
+              name: inv.name,
+              photoUrl: inv.photo_url
+            })) || data.investigators,
+            people: peopleRes.data?.map(p => ({
+              id: p.id,
+              fullName: p.full_name,
+              gang: p.gang,
+              hierarchy: p.hierarchy as "Líder" | "Sub-Líder" | "Membro",
+              phone: p.phone,
+              photoUrl: p.photo_url,
+              vehicleIds: p.vehicle_ids || [],
+              createdAt: p.created_at
+            })) || [],
+            vehicles: vehiclesRes.data?.map(v => ({
+              id: v.id,
+              plate: v.plate,
+              model: v.model,
+              photoUrl: v.photo_url,
+              ownerId: v.owner_id,
+              createdAt: v.created_at
+            })) || [],
+            gangs: gangsRes.data?.map(g => ({
+              id: g.id,
+              name: g.name,
+              description: g.description,
+              color: g.color,
+              alliedGangIds: g.allied_gang_ids || [],
+              createdAt: g.created_at
+            })) || [],
+            cases: casesRes.data?.map(c => ({
+              id: c.id,
+              title: c.title,
+              description: c.description,
+              personIds: c.person_ids || [],
+              vehicleIds: c.vehicle_ids || [],
+              gangIds: c.gang_ids || [],
+              attachments: c.attachments || [],
+              status: c.status as "open" | "closed",
+              closedReason: c.closed_reason,
+              closedAt: c.closed_at,
+              createdAt: c.created_at
+            })) || [],
+            investigations: investigationsRes.data?.map(i => ({
+              id: i.id,
+              title: i.title,
+              sections: i.sections || [],
+              personIds: i.person_ids || [],
+              attachments: i.attachments || [],
+              createdAt: i.created_at
+            })) || [],
+            charges: chargesRes.data?.map(ch => ({
+              id: ch.id,
+              personIds: ch.person_ids || [],
+              vehicleIds: ch.vehicle_ids || [],
+              gangId: ch.gang_id,
+              reason: ch.reason,
+              status: ch.status as "pendente" | "resolvido",
+              createdAt: ch.created_at
+            })) || [],
+            bases: basesRes.data?.map(b => ({
+              id: b.id,
+              name: b.name,
+              description: b.description,
+              images: b.images || [],
+              metadata: b.metadata || {},
+              createdAt: b.created_at
+            })) || [],
+            meetings: meetingsRes.data?.map(m => ({
+              id: m.id,
+              title: m.title,
+              description: m.description,
+              personIds: m.person_ids || [],
+              vehicleIds: m.vehicle_ids || [],
+              gangIds: m.gang_ids || [],
+              attachments: m.attachments || [],
+              meetingDate: m.meeting_date,
+              createdAt: m.created_at
+            })) || [],
+            deeps: deepsRes.data?.map(d => ({
+              id: d.id,
+              title: d.title,
+              description: d.description,
+              images: d.images || [],
+              createdAt: d.created_at
+            })) || [],
+            auctions: auctionsRes.data?.map(a => ({
+              id: a.id,
+              title: a.title,
+              entries: a.entries || [],
+              createdAt: a.created_at
+            })) || [],
+            activityLogs: logsRes.data?.map(log => ({
+              id: log.id,
+              investigatorId: log.investigator_id,
+              investigatorName: log.investigator_name,
+              action: log.action,
+              entityType: log.entity_type,
+              entityId: log.entity_id,
+              timestamp: log.timestamp
+            })) || []
+          });
+        } else {
+          console.warn('Tabelas Supabase não encontradas. Execute o SQL em SUPABASE_SETUP.sql');
+        }
       } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-        toast.error('Erro ao carregar dados do banco');
+        console.error('Erro ao carregar dados do Supabase:', error);
       } finally {
         setIsLoading(false);
       }
@@ -949,6 +963,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     exportData: exportDataMethod,
     importData: importDataMethod,
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
