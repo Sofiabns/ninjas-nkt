@@ -1,6 +1,7 @@
 import { supabase } from "./client";
 import { uploadImageToSupabase } from "./uploadImage";
 import fs from "fs";
+import path from "path";
 
 // Investigador: foto
 export async function uploadInvestigatorPhoto(file: File, investigatorId: string) {
@@ -91,6 +92,54 @@ async function migrarFotosPessoas() {
     const url = await uploadImageToSupabase(new File([file], `${pessoa.id}.jpg`), `people/${pessoa.id}.jpg`);
     // 4. Atualize o registro no banco
     await supabase.from("people").update({ photo_url: url }).eq("id", pessoa.id);
+  }
+}
+
+// MIGRAÇÃO DE ANEXOS DE INVESTIGAÇÕES
+// Ajuste este diretório para onde estão os arquivos antigos das investigações
+const DIR_ANTIGOS = "./attachments_investigacoes";
+
+export async function migrarAttachmentsInvestigacoes() {
+  // 1. Buscar todas as investigações
+  const { data: investigacoes, error } = await supabase
+    .from("investigations")
+    .select("id, attachments");
+
+  if (error) {
+    console.error("Erro ao buscar investigações:", error.message);
+    return;
+  }
+
+  for (const investigacao of investigacoes) {
+    const attachmentsNovos: string[] = [];
+
+    // Supondo que os arquivos antigos estão em uma pasta com nome igual ao id da investigação
+    const pastaInvestigacao = path.join(DIR_ANTIGOS, investigacao.id);
+    if (!fs.existsSync(pastaInvestigacao)) continue;
+
+    const arquivos = fs.readdirSync(pastaInvestigacao);
+    for (const nomeArquivo of arquivos) {
+      const filePath = path.join(pastaInvestigacao, nomeArquivo);
+      const fileBuffer = fs.readFileSync(filePath);
+      const file = new File([fileBuffer], nomeArquivo);
+
+      // Upload para o bucket
+      const url = await uploadImageToSupabase(file, `investigations/${investigacao.id}_${nomeArquivo}`);
+      if (url) attachmentsNovos.push(url);
+    }
+
+    // Atualiza o campo attachments (mantendo os antigos, se quiser)
+    const todosAttachments = [
+      ...(investigacao.attachments || []),
+      ...attachmentsNovos,
+    ];
+
+    await supabase
+      .from("investigations")
+      .update({ attachments: todosAttachments })
+      .eq("id", investigacao.id);
+
+    console.log(`Investigação ${investigacao.id} migrada com ${attachmentsNovos.length} arquivos.`);
   }
 }
 
