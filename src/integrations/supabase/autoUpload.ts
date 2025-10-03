@@ -1,5 +1,6 @@
 import { supabase } from "./client";
 import { uploadImageToSupabase } from "./uploadImage";
+import fs from "fs";
 
 // Investigador: foto
 export async function uploadInvestigatorPhoto(file: File, investigatorId: string) {
@@ -75,6 +76,22 @@ export async function uploadMeetingAttachment(file: File, meetingId: string) {
   attachments.push(url);
   await supabase.from("meetings").update({ attachments }).eq("id", meetingId);
   return attachments;
+}
+
+// Exemplo: migrar fotos de pessoas
+async function migrarFotosPessoas() {
+  // 1. Busque todas as pessoas
+  const { data: pessoas } = await supabase.from("people").select("id, photo_url");
+  for (const pessoa of pessoas) {
+    // 2. Pegue o arquivo local (ajuste o caminho conforme necessário)
+    const filePath = `./fotos_antigas/${pessoa.id}.jpg`;
+    if (!fs.existsSync(filePath)) continue;
+    const file = fs.readFileSync(filePath);
+    // 3. Faça upload para o bucket
+    const url = await uploadImageToSupabase(new File([file], `${pessoa.id}.jpg`), `people/${pessoa.id}.jpg`);
+    // 4. Atualize o registro no banco
+    await supabase.from("people").update({ photo_url: url }).eq("id", pessoa.id);
+  }
 }
 
 // Adapte para outros campos/tabelas conforme necessário!
