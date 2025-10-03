@@ -140,11 +140,12 @@ CREATE INDEX IF NOT EXISTS idx_activity_logs_timestamp ON activity_logs(timestam
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES
-  ('INV-01', 'Hinata'),
-  ('INV-02', 'Luciano'),
-  ('INV-03', 'Miranda'),
-  ('INV-04', 'Lua'),
-  ('INV-05', 'Hiro'),
-  ('INV-06', 'Eloa'),
-  ('INV-07', 'Lara')
+  ('N-00', 'Kitsune'),
+  ('N-01', 'Hinata'),
+  ('N-02', 'Luciano'),
+  ('N-03', 'Miranda'),
+  ('N-04', 'Eloa'),
+  ('N-05', 'Lua'),
+  ('N-06', 'Hiro'),
+  ('N-07', 'Lara')
 ON CONFLICT (id) DO NOTHING;
