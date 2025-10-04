@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/common/FileUpload";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
+import { uploadFile, getUploadsByInvestigation } from "@/integrations/supabase/uploadsService";
 import { Attachment } from "@/types";
 import { toast } from "sonner";
 import { X, Plus } from "lucide-react";
@@ -17,12 +18,16 @@ export default function InvestigationForm() {
   const { data, addInvestigation, updateInvestigation, getInvestigation, getPerson } = useApp();
 
   const [title, setTitle] = useState("");
-  const [sections, setSections] = useState<{ label: string; content: string }[]>([
-    { label: "Resumo", content: "" },
-  ]);
+  const [sections, setSections] = useState<{ label: string; content: string }[]>(
+    [{ label: "Resumo", content: "" }],
+  );
   const [personIds, setPersonIds] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [personSearch, setPersonSearch] = useState("");
+
+  // NOVO BLOCO PARA UPLOADS CENTRALIZADOS
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploads, setUploads] = useState<any[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -33,6 +38,12 @@ export default function InvestigationForm() {
         setPersonIds(investigation.personIds);
         setAttachments(investigation.attachments);
       }
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      getUploadsByInvestigation(id).then(setUploads);
     }
   }, [id]);
 
@@ -65,6 +76,14 @@ export default function InvestigationForm() {
     const updated = [...sections];
     updated[index][field] = value;
     setSections(updated);
+  };
+
+  const handleUpload = async () => {
+    for (const file of files) {
+      await uploadFile(file, { investigationId: id });
+    }
+    const data = await getUploadsByInvestigation(id!);
+    setUploads(data);
   };
 
   const filteredPeople = data.people.filter(
@@ -204,9 +223,30 @@ export default function InvestigationForm() {
             </div>
           </div>
 
+          {/* ANEXOS CENTRALIZADOS */}
           <div>
-            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS</label>
-            <FileUpload attachments={attachments} onChange={setAttachments} />
+            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS CENTRALIZADOS</label>
+            <input
+              type="file"
+              multiple
+              onChange={(e) => setFiles(Array.from(e.target.files || []))}
+            />
+            <Button type="button" onClick={handleUpload} className="mt-2">
+              Enviar Arquivos
+            </Button>
+            <div className="mt-4 flex flex-wrap gap-4">
+              {uploads.map((file) => (
+                <div key={file.id}>
+                  {file.mimetype?.startsWith("image/") ? (
+                    <img src={file.url} alt={file.filename} className="w-40 rounded" />
+                  ) : (
+                    <a href={file.url} target="_blank" rel="noreferrer">
+                      {file.filename}
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4">
