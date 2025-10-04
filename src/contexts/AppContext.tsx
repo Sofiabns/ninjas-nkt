@@ -1065,3 +1065,59 @@ export const useApp = () => {
   if (!context) throw new Error("useApp must be used within AppProvider");
   return context;
 };
+
+
+/**
+ * Faz upload de um arquivo para o bucket 'uploads' e registra na tabela 'uploads'.
+ * @param file Arquivo a ser enviado.
+ * @param relacionamentos Objeto com os IDs relacionados (ex: { investigation_id, person_id }).
+ * @param uploaded_by ID do investigador que fez o upload.
+ */
+export async function uploadAndRegister({
+  file,
+  relacionamentos = {},
+  uploaded_by,
+}: {
+  file: File;
+  relacionamentos?: {
+    person_id?: string;
+    case_id?: string;
+    investigation_id?: string;
+    meeting_id?: string;
+    deep_id?: string;
+    auction_id?: string;
+    base_id?: string;
+    charge_id?: string;
+  };
+  uploaded_by: string;
+}) {
+  // 1. Gerar caminho único
+  const path = `${uploaded_by}/${Date.now()}_${file.name}`;
+
+  // 2. Upload para o bucket 'uploads'
+  const { data, error } = await supabase.storage.from("uploads").upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+  if (error) throw new Error("Erro ao enviar arquivo: " + error.message);
+
+  // 3. Obter URL pública
+  const { data: urlData } = supabase.storage.from("uploads").getPublicUrl(path);
+  const publicUrl = urlData?.publicUrl;
+  if (!publicUrl) throw new Error("Não foi possível obter a URL pública.");
+
+  // 4. Inserir registro na tabela uploads
+  const { error: dbError } = await supabase.from("uploads").insert([
+    {
+      url: publicUrl,
+      filename: file.name,
+      mimetype: file.type,
+      size: file.size,
+      uploaded_by,
+      ...relacionamentos,
+    },
+  ]);
+  if (dbError) throw new Error("Erro ao registrar upload: " + dbError.message);
+
+  return publicUrl;
+}
