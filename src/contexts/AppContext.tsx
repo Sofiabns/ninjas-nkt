@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator, ActivityLog, Meeting, Deep, Auction, Attachment } from "@/types";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/supabase";
 import { generateId } from "@/utils/idGenerator";
 import { toast } from "sonner";
 
@@ -239,6 +239,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: a.id,
               title: a.title,
               entries: a.entries || [],
+              attachments: a.attachments || [],
               createdAt: a.created_at
             })) || [],
             activityLogs: logsRes.data?.map(log => ({

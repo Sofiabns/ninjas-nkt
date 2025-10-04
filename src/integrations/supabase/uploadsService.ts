@@ -1,10 +1,12 @@
 import { supabase } from "./supabase";
 
 // Função para enviar arquivo para o bucket
-export async function uploadFile(file: File, options: { 
+export async function uploadFile(file: File, options: {
   investigationId?: string;
   caseId?: string;
   personId?: string;
+  meetingId?: string;
+  auctionId?: string;
 }) {
   const filePath = `uploads/${Date.now()}_${file.name}`;
 
@@ -28,6 +30,8 @@ export async function uploadFile(file: File, options: {
     investigation_id: options.investigationId || null,
     case_id: options.caseId || null,
     person_id: options.personId || null,
+    meeting_id: options.meetingId || null,
+    auction_id: options.auctionId || null,
   });
 
   if (dbError) throw dbError;

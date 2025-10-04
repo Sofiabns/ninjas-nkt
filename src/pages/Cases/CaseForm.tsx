@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { Attachment } from "@/types";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
 
 export default function CaseForm() {
   const navigate = useNavigate();
@@ -40,18 +42,49 @@ export default function CaseForm() {
     }
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) {
       toast.error("Preencha os campos obrigatórios");
       return;
     }
 
+    let uploadedAttachments: Attachment[] = [];
+
+    // 🚀 Faz upload de cada arquivo antes de salvar o caso
+    for (const att of attachments) {
+      if (att.file) {
+        const url = await uploadFile(att.file, { caseId: id });
+        uploadedAttachments.push({
+          id: generateId("ATT", uploadedAttachments.map(a => a.id)),
+          name: att.file.name,
+          url,
+          type: att.file.type
+        });
+      } else if (att.url) {
+        uploadedAttachments.push(att);
+      }
+    }
+
     if (id) {
-      updateCase(id, { title, description, personIds, vehicleIds, gangIds, attachments });
+      await updateCase(id, {
+        title,
+        description,
+        personIds,
+        vehicleIds,
+        gangIds,
+        attachments: uploadedAttachments,
+      });
       toast.success("Caso atualizado");
     } else {
-      addCase({ title, description, personIds, vehicleIds, gangIds, attachments });
+      await addCase({
+        title,
+        description,
+        personIds,
+        vehicleIds,
+        gangIds,
+        attachments: uploadedAttachments,
+      });
       toast.success("Caso criado");
     }
     navigate("/cases/active");

@@ -8,7 +8,10 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
-import { AuctionEntry } from "@/types";
+import { AuctionEntry, Attachment } from "@/types";
+import { FileUpload } from "@/components/common/FileUpload";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
 
 export default function AuctionForm() {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ export default function AuctionForm() {
 
   const [title, setTitle] = useState("");
   const [entries, setEntries] = useState<AuctionEntry[]>([]);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const [currentGangId, setCurrentGangId] = useState("");
   const [currentItem, setCurrentItem] = useState("");
@@ -28,6 +32,7 @@ export default function AuctionForm() {
       if (auction) {
         setTitle(auction.title);
         setEntries(auction.entries);
+        setAttachments(auction.attachments || []);
       }
     }
   }, [id]);
@@ -54,18 +59,35 @@ export default function AuctionForm() {
     setEntries(entries.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || entries.length === 0) {
       toast.error("Preencha o título e adicione pelo menos uma entrada");
       return;
     }
 
+    let uploadedAttachments: Attachment[] = [];
+
+    // Upload each file before saving the auction
+    for (const att of attachments) {
+      if (att.file) {
+        const url = await uploadFile(att.file, { auctionId: id });
+        uploadedAttachments.push({
+          id: generateId("ATT", uploadedAttachments.map(a => a.id)),
+          name: att.file.name,
+          url,
+          type: att.file.type
+        });
+      } else if (att.url) {
+        uploadedAttachments.push(att);
+      }
+    }
+
     if (id) {
-      updateAuction(id, { title, entries });
+      await updateAuction(id, { title, entries, attachments: uploadedAttachments });
       toast.success("Leilão atualizado");
     } else {
-      addAuction({ title, entries });
+      await addAuction({ title, entries, attachments: uploadedAttachments });
       toast.success("Leilão criado");
     }
     navigate("/auctions");
@@ -198,6 +220,11 @@ export default function AuctionForm() {
               </div>
             </Card>
           )}
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS</label>
+            <FileUpload attachments={attachments} onChange={setAttachments} />
+          </div>
 
           <div className="flex gap-3 pt-4">
             <Button

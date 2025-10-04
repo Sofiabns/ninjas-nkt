@@ -7,10 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/common/FileUpload";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
-import { uploadFile, getUploadsByInvestigation } from "@/integrations/supabase/uploadsService";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
 import { Attachment } from "@/types";
 import { toast } from "sonner";
 import { X, Plus } from "lucide-react";
+import { generateId } from "@/utils/idGenerator";
 
 export default function InvestigationForm() {
   const navigate = useNavigate();
@@ -25,10 +26,6 @@ export default function InvestigationForm() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [personSearch, setPersonSearch] = useState("");
 
-  // NOVO BLOCO PARA UPLOADS CENTRALIZADOS
-  const [files, setFiles] = useState<File[]>([]);
-  const [uploads, setUploads] = useState<any[]>([]);
-
   useEffect(() => {
     if (id) {
       const investigation = getInvestigation(id);
@@ -41,24 +38,45 @@ export default function InvestigationForm() {
     }
   }, [id]);
 
-  useEffect(() => {
-    if (id) {
-      getUploadsByInvestigation(id).then(setUploads);
-    }
-  }, [id]);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || sections.length === 0) {
       toast.error("Preencha os campos obrigatórios");
       return;
     }
 
+    let uploadedAttachments: Attachment[] = [];
+
+    // 🚀 Faz upload de cada arquivo antes de salvar a investigação
+    for (const att of attachments) {
+      if (att.file) {
+        const url = await uploadFile(att.file, { investigationId: id });
+        uploadedAttachments.push({
+          id: generateId("ATT", uploadedAttachments.map(a => a.id)),
+          name: att.file.name,
+          url,
+          type: att.file.type
+        });
+      } else if (att.url) {
+        uploadedAttachments.push(att);
+      }
+    }
+
     if (id) {
-      updateInvestigation(id, { title, sections, personIds, attachments });
+      await updateInvestigation(id, {
+        title,
+        sections,
+        personIds,
+        attachments: uploadedAttachments,
+      });
       toast.success("Investigação atualizada");
     } else {
-      addInvestigation({ title, sections, personIds, attachments });
+      await addInvestigation({
+        title,
+        sections,
+        personIds,
+        attachments: uploadedAttachments,
+      });
       toast.success("Investigação criada");
     }
     navigate("/investigations");
@@ -76,14 +94,6 @@ export default function InvestigationForm() {
     const updated = [...sections];
     updated[index][field] = value;
     setSections(updated);
-  };
-
-  const handleUpload = async () => {
-    for (const file of files) {
-      await uploadFile(file, { investigationId: id });
-    }
-    const data = await getUploadsByInvestigation(id!);
-    setUploads(data);
   };
 
   const filteredPeople = data.people.filter(
@@ -223,30 +233,9 @@ export default function InvestigationForm() {
             </div>
           </div>
 
-          {/* ANEXOS CENTRALIZADOS */}
           <div>
-            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS CENTRALIZADOS</label>
-            <input
-              type="file"
-              multiple
-              onChange={(e) => setFiles(Array.from(e.target.files || []))}
-            />
-            <Button type="button" onClick={handleUpload} className="mt-2">
-              Enviar Arquivos
-            </Button>
-            <div className="mt-4 flex flex-wrap gap-4">
-              {uploads.map((file) => (
-                <div key={file.id}>
-                  {file.mimetype?.startsWith("image/") ? (
-                    <img src={file.url} alt={file.filename} className="w-40 rounded" />
-                  ) : (
-                    <a href={file.url} target="_blank" rel="noreferrer">
-                      {file.filename}
-                    </a>
-                  )}
-                </div>
-              ))}
-            </div>
+            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS</label>
+            <FileUpload attachments={attachments} onChange={setAttachments} />
           </div>
 
           <div className="flex gap-3 pt-4">

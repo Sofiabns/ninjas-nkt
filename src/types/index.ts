@@ -38,6 +38,7 @@ export interface Attachment {
   name: string;
   url: string;
   type: string;
+  file?: File;
 }
 
 export interface Case {
@@ -122,6 +123,7 @@ export interface Auction {
   id: string;
   title: string;
   entries: AuctionEntry[];
+  attachments: Attachment[];
   createdAt: string;
 }
 

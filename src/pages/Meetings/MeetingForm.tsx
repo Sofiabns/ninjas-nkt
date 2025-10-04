@@ -7,9 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileUpload } from "@/components/common/FileUpload";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
 import { Attachment } from "@/types";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { generateId } from "@/utils/idGenerator";
 
 export default function MeetingForm() {
   const navigate = useNavigate();
@@ -45,18 +47,51 @@ export default function MeetingForm() {
     }
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) {
       toast.error("Preencha os campos obrigatórios");
       return;
     }
 
+    let uploadedAttachments: Attachment[] = [];
+
+    // 🚀 Faz upload de cada arquivo antes de salvar a reunião
+    for (const att of attachments) {
+      if (att.file) {
+        const url = await uploadFile(att.file, { investigationId: id });
+        uploadedAttachments.push({
+          id: generateId("ATT", uploadedAttachments.map(a => a.id)),
+          name: att.file.name,
+          url,
+          type: att.file.type
+        });
+      } else if (att.url) {
+        uploadedAttachments.push(att);
+      }
+    }
+
     if (id) {
-      updateMeeting(id, { title, description, meetingDate, personIds, vehicleIds, gangIds, attachments });
+      await updateMeeting(id, {
+        title,
+        description,
+        meetingDate,
+        personIds,
+        vehicleIds,
+        gangIds,
+        attachments: uploadedAttachments,
+      });
       toast.success("Reunião atualizada");
     } else {
-      addMeeting({ title, description, meetingDate, personIds, vehicleIds, gangIds, attachments });
+      await addMeeting({
+        title,
+        description,
+        meetingDate,
+        personIds,
+        vehicleIds,
+        gangIds,
+        attachments: uploadedAttachments,
+      });
       toast.success("Reunião criada");
     }
     navigate("/meetings");

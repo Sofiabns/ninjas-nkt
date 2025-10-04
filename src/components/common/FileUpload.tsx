@@ -30,6 +30,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ attachments, onChange, m
         name: file.name,
         url,
         type: file.type,
+        file,
       });
     }
 
