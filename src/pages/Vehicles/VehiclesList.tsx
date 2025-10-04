@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function VehiclesList() {
-  const { data, deleteVehicle, getPerson } = useApp();
+  const { data, deleteVehicle, getPerson, getGang } = useApp();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
 
@@ -58,6 +58,7 @@ export default function VehiclesList() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((vehicle, index) => {
           const owner = vehicle.ownerId ? getPerson(vehicle.ownerId) : null;
+          const gang = vehicle.gangId ? getGang(vehicle.gangId) : null;
 
           return (
             <motion.div
@@ -91,6 +92,12 @@ export default function VehiclesList() {
                   {owner && (
                     <div className="text-xs text-muted-foreground">
                       Proprietário: {owner.fullName}
+                    </div>
+                  )}
+                  
+                  {gang && (
+                    <div className="text-xs text-muted-foreground">
+                      Facção: {gang.name}
                     </div>
                   )}
                 </div>
