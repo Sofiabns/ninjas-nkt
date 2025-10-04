@@ -131,6 +131,27 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   timestamp TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Uploads table
+CREATE TABLE IF NOT EXISTS uploads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  url TEXT NOT NULL,
+  filename TEXT NOT NULL,
+  mimetype TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  investigation_id TEXT,
+  case_id TEXT,
+  person_id TEXT,
+  meeting_id TEXT,
+  auction_id TEXT,
+  vehicle_id TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create storage bucket for uploads
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('uploads', 'uploads', true)
+ON CONFLICT (id) DO NOTHING;
+
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_people_gang ON people(gang);
 CREATE INDEX IF NOT EXISTS idx_vehicles_owner ON vehicles(owner_id);
@@ -138,6 +159,10 @@ CREATE INDEX IF NOT EXISTS idx_cases_status ON cases(status);
 CREATE INDEX IF NOT EXISTS idx_charges_status ON charges(status);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_investigator ON activity_logs(investigator_id);
 CREATE INDEX IF NOT EXISTS idx_activity_logs_timestamp ON activity_logs(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_uploads_investigation ON uploads(investigation_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_case ON uploads(case_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_person ON uploads(person_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_vehicle ON uploads(vehicle_id);
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES
