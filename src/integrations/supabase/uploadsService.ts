@@ -49,3 +49,45 @@ export async function getUploadsByInvestigation(id: string) {
   if (error) throw error;
   return data;
 }
+
+// Buscar uploads vinculados a uma entidade
+export async function getUploadsByEntity(entityType: string, entityId: string) {
+  const columnMap = {
+    investigation: 'investigation_id',
+    case: 'case_id',
+    person: 'person_id',
+    meeting: 'meeting_id',
+    auction: 'auction_id',
+  };
+
+  const column = columnMap[entityType as keyof typeof columnMap];
+  if (!column) throw new Error('Tipo de entidade inválido');
+
+  const { data, error } = await supabase
+    .from("uploads")
+    .select("*")
+    .eq(column, entityId);
+
+  if (error) throw error;
+  return data;
+}
+
+// Buscar uploads vinculados a uma pessoa
+export async function getUploadsByPerson(id: string) {
+  return getUploadsByEntity('person', id);
+}
+
+// Buscar uploads vinculados a um caso
+export async function getUploadsByCase(id: string) {
+  return getUploadsByEntity('case', id);
+}
+
+// Buscar uploads vinculados a uma reunião
+export async function getUploadsByMeeting(id: string) {
+  return getUploadsByEntity('meeting', id);
+}
+
+// Buscar uploads vinculados a um leilão
+export async function getUploadsByAuction(id: string) {
+  return getUploadsByEntity('auction', id);
+}

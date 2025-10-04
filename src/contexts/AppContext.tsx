@@ -389,7 +389,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       gang: newPerson.gang,
       hierarchy: newPerson.hierarchy,
       phone: newPerson.phone,
-      photo_url: newPerson.photoUrl,
       vehicle_ids: newPerson.vehicleIds,
       created_at: newPerson.createdAt
     });
@@ -409,16 +408,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (person.gang) updateData.gang = person.gang;
     if (person.hierarchy) updateData.hierarchy = person.hierarchy;
     if (person.phone) updateData.phone = person.phone;
-    if (person.photoUrl !== undefined) updateData.photo_url = person.photoUrl;
     if (person.vehicleIds) updateData.vehicle_ids = person.vehicleIds;
-    
+
     const { error } = await supabase.from('people').update(updateData).eq('id', id);
-    
+
     if (error) {
       toast.error('Erro ao atualizar pessoa');
       return;
     }
-    
+
     setData((prev) => ({
       ...prev,
       people: prev.people.map((p) => (p.id === id ? { ...p, ...person } : p)),
