@@ -20,6 +20,7 @@ export default function VehicleForm() {
   const [model, setModel] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [ownerId, setOwnerId] = useState<string>("");
+  const [gangId, setGangId] = useState<string>("");
 
   useEffect(() => {
     if (id) {
@@ -29,6 +30,7 @@ export default function VehicleForm() {
         setModel(vehicle.model);
         setPhotoUrl(vehicle.photoUrl || "");
         setOwnerId(vehicle.ownerId || "");
+        setGangId(vehicle.gangId || "");
       }
     }
   }, [id]);
@@ -58,10 +60,10 @@ export default function VehicleForm() {
     }
 
     if (id) {
-      updateVehicle(id, { plate, model, photoUrl, ownerId: ownerId || undefined });
+      updateVehicle(id, { plate, model, photoUrl, ownerId: ownerId || undefined, gangId: gangId || undefined });
       toast.success("Veículo atualizado");
     } else {
-      addVehicle({ plate, model, photoUrl, ownerId: ownerId || undefined });
+      addVehicle({ plate, model, photoUrl, ownerId: ownerId || undefined, gangId: gangId || undefined });
       toast.success("Veículo registrado");
     }
     navigate("/vehicles");
@@ -148,6 +150,28 @@ export default function VehicleForm() {
                 {(data?.people ?? []).map((person) => (
                   <SelectItem key={person.id} value={person.id}>
                     {person.fullName} ({person.id})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">
+              FACÇÃO (OPCIONAL)
+            </label>
+            <Select
+              value={gangId === "" ? "none" : gangId}
+              onValueChange={(value) => setGangId(value === "none" ? "" : value)}
+            >
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder="Selecione a facção" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border z-50">
+                <SelectItem value="none">Nenhuma</SelectItem>
+                {(data?.gangs ?? []).map((gang) => (
+                  <SelectItem key={gang.id} value={gang.id}>
+                    {gang.name}
                   </SelectItem>
                 ))}
               </SelectContent>

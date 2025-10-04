@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   model TEXT NOT NULL,
   photo_url TEXT,
   owner_id TEXT,
+  gang_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
