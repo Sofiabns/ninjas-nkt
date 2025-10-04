@@ -102,6 +102,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   });
   const [currentInvestigator, setCurrentInvestigatorState] = useState<Investigator | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [people, setPeople] = useState<Person[]>([]);
+  const [charges, setCharges] = useState<Charge[]>([]);
+  const [bases, setBases] = useState<Base[]>([]);
+  const [meetings, setMeetings] = useState<Meeting[]>([]);
+  const [deeps, setDeeps] = useState<Deep[]>([]);
+  const [auctions, setAuctions] = useState<Auction[]>([]);
+  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
 
   // Load all data from Supabase on mount
   useEffect(() => {
@@ -254,6 +262,79 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     loadAllData();
+  }, []);
+
+  useEffect(() => {
+    // Tabelas que você quer atualizar em tempo real
+    const tables = [
+      "people",
+      "investigators",
+      "vehicles",
+      "gangs",
+      "cases",
+      "investigations",
+      "charges",
+      "bases",
+      "meetings",
+      "deeps",
+      "auctions",
+      "activityLogs",
+    ];
+
+    // Função para atualizar estado de cada tabela
+    const setters = {
+      people: setPeople,
+      investigators: getInvestigation,
+      vehicles: setVehicles,
+      gangs: getGang,
+      cases: getCase,
+      investigations: getInvestigation,
+      charges: setCharges,
+      bases: setBases,
+      meetings: setMeetings,
+      deeps: setDeeps,
+      auctions: setAuctions,
+      activityLogs: setActivityLogs,
+    };
+
+    // Carregar dados iniciais de todas as tabelas
+    tables.forEach((table) => {
+      supabase.from(table).select("*").then(({ data }) => {
+        if (setters[table] && data) setters[table](data);
+      });
+    });
+
+    // Criar canais realtime para todas as tabelas
+    const channels = tables.map((table) =>
+      supabase
+        .channel(`${table}-channel`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table },
+          (payload) => {
+            const setState = setters[table];
+            if (!setState) return;
+
+            setState((prev) => {
+              if (payload.eventType === "INSERT") {
+                return [...prev, payload.new];
+              } else if (payload.eventType === "UPDATE") {
+                return prev.map((item) =>
+                  item.id === payload.new.id ? payload.new : item
+                );
+              } else if (payload.eventType === "DELETE") {
+                return prev.filter((item) => item.id !== payload.old.id);
+              }
+              return prev;
+            });
+          }
+        )
+        .subscribe()
+    );
+
+    return () => {
+      channels.forEach((channel) => supabase.removeChannel(channel));
+    };
   }, []);
 
   const setCurrentInvestigator = (investigator: Investigator) => {
