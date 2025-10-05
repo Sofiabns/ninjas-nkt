@@ -86,7 +86,6 @@ CREATE TABLE IF NOT EXISTS bases (
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   gang_id TEXT,
-  images TEXT[] DEFAULT '{}',
   attachments JSONB DEFAULT '[]',
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -112,7 +111,6 @@ CREATE TABLE IF NOT EXISTS deeps (
   description TEXT NOT NULL,
   person_ids TEXT[] DEFAULT '{}',
   gang_id TEXT,
-  images TEXT[] DEFAULT '{}',
   attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
