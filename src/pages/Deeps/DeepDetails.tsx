@@ -53,6 +53,16 @@ export default function DeepDetails() {
             <p className="text-muted-foreground font-mono text-sm">
               Criado em {new Date(deep.createdAt).toLocaleString()}
             </p>
+
+            {deep.attachments && deep.attachments.length > 0 && deep.attachments[0].type.startsWith("image/") && (
+              <div className="aspect-video bg-secondary rounded mt-4 overflow-hidden">
+                <img
+                  src={deep.attachments[0].url}
+                  alt={deep.attachments[0].name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
           </div>
 
           <Button

@@ -52,6 +52,16 @@ export default function BaseDetails() {
             <p className="text-muted-foreground font-mono text-sm">
               Criado em {new Date(base.createdAt).toLocaleString()}
             </p>
+
+            {base.attachments && base.attachments.length > 0 && base.attachments[0].type.startsWith("image/") && (
+              <div className="aspect-video bg-secondary rounded mt-4 overflow-hidden">
+                <img
+                  src={base.attachments[0].url}
+                  alt={base.attachments[0].name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
           </div>
 
           <Button
