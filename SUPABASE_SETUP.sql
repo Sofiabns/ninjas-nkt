@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS people (
   id TEXT PRIMARY KEY,
   full_name TEXT NOT NULL,
   gang TEXT NOT NULL,
-  hierarchy TEXT NOT NULL CHECK (hierarchy IN ('Líder', 'Sub-Líder', 'Membro')),
+  hierarchy TEXT NOT NULL CHECK (hierarchy IN ('Lider', 'Sub-Lider', 'Membro')),
   phone TEXT NOT NULL,
   photo_url TEXT,
   vehicle_ids TEXT[] DEFAULT '{}',
