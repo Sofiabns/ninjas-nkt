@@ -80,7 +80,6 @@ export interface Base {
   name: string;
   description: string;
   gangId?: string;
-  images: string[];
   attachments: Attachment[];
   metadata: Record<string, string>;
   createdAt: string;
@@ -114,7 +113,6 @@ export interface Deep {
   description: string;
   personIds: string[];
   gangId?: string;
-  images: string[];
   attachments: Attachment[];
   createdAt: string;
 }
