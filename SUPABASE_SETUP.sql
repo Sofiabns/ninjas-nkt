@@ -85,7 +85,9 @@ CREATE TABLE IF NOT EXISTS bases (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
+  gang_id TEXT,
   images TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -108,7 +110,10 @@ CREATE TABLE IF NOT EXISTS deeps (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
+  person_ids TEXT[] DEFAULT '{}',
+  gang_id TEXT,
   images TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -172,6 +177,13 @@ CREATE INDEX IF NOT EXISTS idx_uploads_deep ON uploads(deep_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_base ON uploads(base_id);
 CREATE INDEX IF NOT EXISTS idx_deeps_gang ON deeps(gang_id);
 CREATE INDEX IF NOT EXISTS idx_bases_gang ON bases(gang_id);
+
+-- Add missing columns to existing tables (for updates)
+ALTER TABLE bases ADD COLUMN IF NOT EXISTS gang_id TEXT;
+ALTER TABLE bases ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
+ALTER TABLE deeps ADD COLUMN IF NOT EXISTS person_ids TEXT[] DEFAULT '{}';
+ALTER TABLE deeps ADD COLUMN IF NOT EXISTS gang_id TEXT;
+ALTER TABLE deeps ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES
