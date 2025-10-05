@@ -79,14 +79,14 @@ const AppContext = createContext<AppContextType | null>(null);
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<AppData>({
     investigators: [
-      { id: "N-00", name: "Kitsune" },
-      { id: "N-01", name: "Hinata" },
-      { id: "N-02", name: "Luciano" },
-      { id: "N-03", name: "Miranda" },
-      { id: "N-04", name: "Eloa" },
-      { id: "N-05", name: "Lua" },
-      { id: "N-06", name: "Hiro" },
-      { id: "N-07", name: "Lara" },
+      { id: "N-00", name: "Kitsune", attachments: [] },
+      { id: "N-01", name: "Hinata", attachments: [] },
+      { id: "N-02", name: "Luciano", attachments: [] },
+      { id: "N-03", name: "Miranda", attachments: [] },
+      { id: "N-04", name: "Eloa", attachments: [] },
+      { id: "N-05", name: "Lua", attachments: [] },
+      { id: "N-06", name: "Hiro", attachments: [] },
+      { id: "N-07", name: "Lara", attachments: [] },
     ],
     people: [],
     vehicles: [],
@@ -151,7 +151,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             investigators: investigatorsRes.data?.map(inv => ({
               id: inv.id,
               name: inv.name,
-              photoUrl: inv.photo_url
+              attachments: []
             })) || data.investigators,
             people: peopleRes.data?.map(p => ({
               id: p.id,

@@ -191,9 +191,9 @@ export default function GlobalSearch() {
                   onClick={() => navigate(`/people/${person.id}`)}
                 >
                   <div className="flex items-start gap-4">
-                    {person.photoUrl && (
+                    {person.attachments.length > 0 && (
                       <img
-                        src={person.photoUrl}
+                        src={person.attachments[0].url}
                         alt={person.fullName}
                         className="w-16 h-16 rounded object-cover"
                       />
@@ -252,9 +252,9 @@ export default function GlobalSearch() {
               >
                 <Card className="p-4 bg-card border-border hover:border-primary transition-all">
                   <div className="flex items-start gap-4">
-                    {vehicle.photoUrl && (
+                    {vehicle.attachments.length > 0 && (
                       <img
-                        src={vehicle.photoUrl}
+                        src={vehicle.attachments[0].url}
                         alt={vehicle.model}
                         className="w-16 h-16 rounded object-cover"
                       />

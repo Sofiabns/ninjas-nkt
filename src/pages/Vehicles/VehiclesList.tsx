@@ -69,9 +69,9 @@ export default function VehiclesList() {
             >
               <Card className="p-4 bg-card border-border hover:border-primary transition-all">
                 <div className="aspect-video bg-secondary rounded mb-3 overflow-hidden">
-                  {vehicle.photoUrl ? (
+                  {vehicle.attachments.length > 0 ? (
                     <img
-                      src={vehicle.photoUrl}
+                      src={vehicle.attachments[0].url}
                       alt={vehicle.model}
                       className="w-full h-full object-cover"
                     />

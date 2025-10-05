@@ -10,6 +10,8 @@ import { formatPhone, validatePhone } from "@/utils/validation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, Loader2 } from "lucide-react";
 import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
+import { Attachment } from "@/types";
 
 export default function PersonForm() {
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function PersonForm() {
   const [gang, setGang] = useState("");
   const [hierarchy, setHierarchy] = useState<"Lider" | "Sub-Lider" | "Membro">("Membro");
   const [phone, setPhone] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -33,7 +35,7 @@ export default function PersonForm() {
         setGang(person.gang);
         setHierarchy(person.hierarchy);
         setPhone(person.phone);
-        setPhotoUrl(person.photoUrl || "");
+        setAttachments(person.attachments);
         setVehicleIds(person.vehicleIds);
       }
     }
@@ -50,7 +52,7 @@ export default function PersonForm() {
     setIsUploading(true);
     try {
       const url = await uploadFile(file, { personId: id || "new" });
-      setPhotoUrl(url);
+      setAttachments([{ id: generateId('ATT', []), name: 'photo', url: url, type: 'image' }]);
       toast.success("Foto enviada com sucesso");
     } catch (error) {
       console.error("Erro ao fazer upload:", error);
@@ -73,10 +75,10 @@ export default function PersonForm() {
     }
 
     if (id) {
-      updatePerson(id, { fullName, gang, hierarchy, phone, photoUrl, vehicleIds });
+      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds });
       toast.success("Pessoa atualizada");
     } else {
-      addPerson({ fullName, gang, hierarchy, phone, photoUrl, vehicleIds });
+      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds });
       toast.success("Pessoa registrada");
     }
     navigate("/people");
@@ -103,8 +105,8 @@ export default function PersonForm() {
             />
             <div className="flex items-center gap-4">
               <div className="w-24 h-24 bg-secondary rounded border border-border overflow-hidden">
-                {photoUrl ? (
-                  <img src={photoUrl} alt="Foto" className="w-full h-full object-cover" />
+                {attachments.length > 0 ? (
+                  <img src={attachments[0].url} alt="Foto" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-4xl text-muted-foreground">
                     {fullName[0] || "?"}

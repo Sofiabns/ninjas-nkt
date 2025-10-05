@@ -55,8 +55,8 @@ export default function PersonDetails() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 bg-card border-border">
           <div className="w-full aspect-square bg-secondary rounded overflow-hidden mb-4">
-            {person.photoUrl ? (
-              <img src={person.photoUrl} alt={person.fullName} className="w-full h-full object-cover" />
+            {person.attachments.length > 0 ? (
+              <img src={person.attachments[0].url} alt={person.fullName} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-6xl text-muted-foreground">
                 {person.fullName[0]}

@@ -10,6 +10,8 @@ import { formatPlate, validatePlate } from "@/utils/validation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload } from "lucide-react";
 import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
+import { Attachment } from "@/types";
 
 export default function VehicleForm() {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ export default function VehicleForm() {
 
   const [plate, setPlate] = useState("");
   const [model, setModel] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [ownerId, setOwnerId] = useState<string>("");
   const [gangId, setGangId] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
@@ -30,7 +32,7 @@ export default function VehicleForm() {
       if (vehicle) {
         setPlate(vehicle.plate);
         setModel(vehicle.model);
-        setPhotoUrl(vehicle.photoUrl || "");
+        setAttachments(vehicle.attachments);
         setOwnerId(vehicle.ownerId || "");
         setGangId(vehicle.gangId || "");
       }
@@ -47,7 +49,7 @@ export default function VehicleForm() {
       try {
         setIsUploading(true);
         const url = await uploadFile(file, { vehicleId: id });
-        setPhotoUrl(url);
+        setAttachments([{ id: generateId('ATT', []), name: 'photo', url: url, type: 'image' }]);
         toast.success("Foto enviada com sucesso");
       } catch (error) {
         console.error('Erro no upload:', error);
@@ -71,10 +73,10 @@ export default function VehicleForm() {
     }
 
     if (id) {
-      updateVehicle(id, { plate, model, photoUrl, ownerId: ownerId || undefined, gangId: gangId || undefined });
+      updateVehicle(id, { plate, model, attachments, ownerId: ownerId || undefined, gangId: gangId || undefined });
       toast.success("Veículo atualizado");
     } else {
-      addVehicle({ plate, model, photoUrl, ownerId: ownerId || undefined, gangId: gangId || undefined });
+      addVehicle({ plate, model, attachments, ownerId: ownerId || undefined, gangId: gangId || undefined });
       toast.success("Veículo registrado");
     }
     navigate("/vehicles");
@@ -101,8 +103,8 @@ export default function VehicleForm() {
             />
             <div className="flex items-center gap-4">
               <div className="w-32 h-24 bg-secondary rounded border border-border overflow-hidden">
-                {photoUrl ? (
-                  <img src={photoUrl} alt="Foto" className="w-full h-full object-cover" />
+                {attachments.length > 0 ? (
+                  <img src={attachments[0].url} alt="Foto" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-4xl text-muted-foreground">
                     🚗

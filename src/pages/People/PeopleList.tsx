@@ -89,9 +89,9 @@ export default function PeopleList() {
             <Card className="p-4 bg-card border-border hover:border-primary transition-all">
               <div className="flex items-start gap-3">
                 <div className="w-16 h-16 bg-secondary rounded flex-shrink-0 overflow-hidden">
-                  {person.photoUrl ? (
+                  {person.attachments.length > 0 ? (
                     <img
-                      src={person.photoUrl}
+                      src={person.attachments[0].url}
                       alt={person.fullName}
                       className="w-full h-full object-cover"
                     />

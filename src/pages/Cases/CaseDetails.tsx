@@ -94,9 +94,9 @@ export default function CaseDetails() {
                     className="flex items-center gap-3 p-3 bg-secondary rounded border border-border cursor-pointer hover:border-primary transition-colors"
                     onClick={() => navigate(`/people/${personId}`)}
                   >
-                    {person.photoUrl && (
+                    {person.attachments.length > 0 && (
                       <img
-                        src={person.photoUrl}
+                        src={person.attachments[0].url}
                         alt={person.fullName}
                         className="w-12 h-12 rounded object-cover"
                       />

@@ -108,9 +108,9 @@ export default function GangDetails() {
               className="flex items-center gap-2 p-2 bg-secondary rounded border border-border cursor-pointer hover:border-primary transition-colors"
               onClick={() => navigate(`/people/${member.id}`)}
             >
-              {member.photoUrl && (
+              {member.attachments.length > 0 && (
                 <img
-                  src={member.photoUrl}
+                  src={member.attachments[0].url}
                   alt={member.fullName}
                   className="w-10 h-10 rounded object-cover"
                 />

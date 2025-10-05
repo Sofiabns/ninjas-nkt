@@ -161,9 +161,9 @@ export default function CaseForm() {
                     }}
                     className="w-full p-2 hover:bg-secondary text-left flex items-center gap-2"
                   >
-                    {person.photoUrl && (
+                    {person.attachments.length > 0 && (
                       <img
-                        src={person.photoUrl}
+                        src={person.attachments[0].url}
                         alt={person.fullName}
                         className="w-8 h-8 rounded object-cover"
                       />
@@ -185,9 +185,9 @@ export default function CaseForm() {
                     key={personId}
                     className="flex items-center gap-2 px-3 py-1 bg-secondary border border-border rounded"
                   >
-                    {person.photoUrl && (
+                    {person.attachments.length > 0 && (
                       <img
-                        src={person.photoUrl}
+                        src={person.attachments[0].url}
                         alt={person.fullName}
                         className="w-6 h-6 rounded object-cover"
                       />
