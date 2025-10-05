@@ -8,6 +8,8 @@ export async function uploadFile(file: File, options: {
   meetingId?: string;
   auctionId?: string;
   vehicleId?: string;
+  deepId?: string;
+  baseId?: string;
 }) {
   const filePath = `uploads/${Date.now()}_${file.name}`;
 
@@ -34,6 +36,8 @@ export async function uploadFile(file: File, options: {
     meeting_id: options.meetingId || null,
     auction_id: options.auctionId || null,
     vehicle_id: options.vehicleId || null,
+    deep_id: options.deepId || null,
+    base_id: options.baseId || null,
   });
 
   if (dbError) throw dbError;
@@ -61,6 +65,8 @@ export async function getUploadsByEntity(entityType: string, entityId: string) {
     meeting: 'meeting_id',
     auction: 'auction_id',
     vehicle: 'vehicle_id',
+    deep: 'deep_id',
+    base: 'base_id',
   };
 
   const column = columnMap[entityType as keyof typeof columnMap];
@@ -98,4 +104,14 @@ export async function getUploadsByAuction(id: string) {
 // Buscar uploads vinculados a um veículo
 export async function getUploadsByVehicle(id: string) {
   return getUploadsByEntity('vehicle', id);
+}
+
+// Buscar uploads vinculados a um deep
+export async function getUploadsByDeep(id: string) {
+  return getUploadsByEntity('deep', id);
+}
+
+// Buscar uploads vinculados a uma base
+export async function getUploadsByBase(id: string) {
+  return getUploadsByEntity('base', id);
 }

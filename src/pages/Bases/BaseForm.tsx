@@ -1,44 +1,55 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileUpload } from "@/components/common/FileUpload";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { fileToDataUrl } from "@/utils/validation";
-import { Upload, X } from "lucide-react";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
+import { Attachment } from "@/types";
 
 export default function BaseForm() {
   const navigate = useNavigate();
-  const { addBase } = useApp();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { data, addBase } = useApp();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [images, setImages] = useState<string[]>([]);
+  const [gangId, setGangId] = useState<string>("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const newImages: string[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const dataUrl = await fileToDataUrl(files[i]);
-      newImages.push(dataUrl);
-    }
-    setImages([...images, ...newImages]);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("Preencha o nome da base");
       return;
     }
 
-    addBase({ name, description, images, metadata: {} });
+    let uploadedAttachments: Attachment[] = [];
+
+    // 🚀 Upload de arquivos para o Supabase
+    for (const att of attachments) {
+      if (att.file) {
+        const url = await uploadFile(att.file, { baseId: undefined });
+        uploadedAttachments.push({
+          id: generateId("ATT", uploadedAttachments.map(a => a.id)),
+          name: att.file.name,
+          url,
+          type: att.file.type
+        });
+      } else if (att.url) {
+        uploadedAttachments.push(att);
+      }
+    }
+
+    // images vazias porque agora usamos attachments
+    const images: string[] = [];
+
+    await addBase({ name, description, gangId, images, attachments: uploadedAttachments, metadata: {} });
     toast.success("Base criada");
     navigate("/bases");
   };
@@ -73,40 +84,25 @@ export default function BaseForm() {
           </div>
 
           <div>
-            <label className="text-sm font-mono text-foreground mb-2 block">IMAGENS</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Imagens
-            </Button>
-
-            {images.length > 0 && (
-              <div className="grid grid-cols-3 gap-3 mt-3">
-                {images.map((img, index) => (
-                  <div key={index} className="relative">
-                    <img src={img} alt="" className="w-full h-24 object-cover rounded" />
-                    <button
-                      type="button"
-                      onClick={() => setImages(images.filter((_, i) => i !== index))}
-                      className="absolute top-1 right-1 bg-destructive text-white rounded p-1"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
+            <label className="text-sm font-mono text-foreground mb-2 block">FACÇÃO</label>
+            <Select value={gangId} onValueChange={setGangId}>
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder="Selecione uma facção (opcional)" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border z-50">
+                <SelectItem value="">Nenhuma</SelectItem>
+                {data.gangs.map((gang) => (
+                  <SelectItem key={gang.id} value={gang.id}>
+                    {gang.name}
+                  </SelectItem>
                 ))}
-              </div>
-            )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS</label>
+            <FileUpload attachments={attachments} onChange={setAttachments} />
           </div>
 
           <div className="flex gap-3 pt-4">

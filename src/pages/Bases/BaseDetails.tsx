@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/contexts/AppContext";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, FileText, ExternalLink } from "lucide-react";
 
 export default function BaseDetails() {
   const { id } = useParams();
@@ -26,14 +27,7 @@ export default function BaseDetails() {
     );
   }
 
-  const handleDownloadImage = (url: string, index: number) => {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${base.name}_${index + 1}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const gang = base.gangId ? data.gangs.find((g) => g.id === base.gangId) : null;
 
   return (
     <div className="space-y-6">
@@ -74,25 +68,57 @@ export default function BaseDetails() {
         <p className="text-foreground whitespace-pre-wrap">{base.description}</p>
       </Card>
 
-      {base.images.length > 0 && (
+      {gang && (
         <Card className="p-6 bg-card border-border">
-          <h2 className="text-xl font-bold text-primary mb-4">IMAGENS ({base.images.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {base.images.map((img, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={img}
-                  alt={`${base.name} ${index + 1}`}
-                  className="w-full h-64 object-cover rounded border border-border"
-                />
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={() => handleDownloadImage(img, index)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
+          <h2 className="text-xl font-bold text-primary mb-4">FACÇÃO</h2>
+          <Badge 
+            style={{ backgroundColor: gang.color, color: '#fff' }}
+            className="text-lg px-4 py-2"
+          >
+            {gang.name}
+          </Badge>
+        </Card>
+      )}
+
+      {base.attachments && base.attachments.length > 0 && (
+        <Card className="p-6 bg-card border-border">
+          <h2 className="text-xl font-bold text-primary mb-4">ANEXOS ({base.attachments.length})</h2>
+          <div className="space-y-2">
+            {base.attachments.map((attachment) => (
+              <div
+                key={attachment.id}
+                className="flex items-center justify-between p-3 bg-secondary rounded border border-border"
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-mono text-foreground">{attachment.name}</p>
+                    <p className="text-xs text-muted-foreground">{attachment.type}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => window.open(attachment.url, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = attachment.url;
+                      link.download = attachment.name;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

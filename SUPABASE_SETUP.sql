@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS bases (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  attachments JSONB DEFAULT '[]',
+  images TEXT[] DEFAULT '{}',
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS deeps (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  attachments JSONB DEFAULT '[]',
+  images TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS auctions (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   entries JSONB DEFAULT '[]',
+  attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -144,6 +145,8 @@ CREATE TABLE IF NOT EXISTS uploads (
   meeting_id TEXT,
   auction_id TEXT,
   vehicle_id TEXT,
+  deep_id TEXT,
+  base_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -163,6 +166,12 @@ CREATE INDEX IF NOT EXISTS idx_uploads_investigation ON uploads(investigation_id
 CREATE INDEX IF NOT EXISTS idx_uploads_case ON uploads(case_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_person ON uploads(person_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_vehicle ON uploads(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_meeting ON uploads(meeting_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_auction ON uploads(auction_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_deep ON uploads(deep_id);
+CREATE INDEX IF NOT EXISTS idx_uploads_base ON uploads(base_id);
+CREATE INDEX IF NOT EXISTS idx_deeps_gang ON deeps(gang_id);
+CREATE INDEX IF NOT EXISTS idx_bases_gang ON bases(gang_id);
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES

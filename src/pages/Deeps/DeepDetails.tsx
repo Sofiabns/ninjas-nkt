@@ -3,8 +3,9 @@ import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/contexts/AppContext";
-import { ArrowLeft, Download } from "lucide-react";
+import { ArrowLeft, Download, FileText, ExternalLink } from "lucide-react";
 
 export default function DeepDetails() {
   const { id } = useParams();
@@ -26,14 +27,8 @@ export default function DeepDetails() {
     );
   }
 
-  const handleDownloadImage = (url: string, index: number) => {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${deep.title}_${index + 1}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const gang = deep.gangId ? data.gangs.find((g) => g.id === deep.gangId) : null;
+  const people = deep.personIds?.map(pid => data.people.find(p => p.id === pid)).filter(Boolean) || [];
 
   return (
     <div className="space-y-6">
@@ -74,26 +69,84 @@ export default function DeepDetails() {
         <p className="text-foreground whitespace-pre-wrap">{deep.description}</p>
       </Card>
 
-      {deep.images.length > 0 && (
+      {gang && (
         <Card className="p-6 bg-card border-border">
-          <h2 className="text-xl font-bold text-primary mb-4">IMAGENS ({deep.images.length})</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {deep.images.map((img, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={img}
-                  alt={`${deep.title} ${index + 1}`}
-                  className="w-full h-64 object-cover rounded border border-border cursor-pointer"
-                  onClick={() => window.open(img, '_blank')}
-                />
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  onClick={() => handleDownloadImage(img, index)}
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
+          <h2 className="text-xl font-bold text-primary mb-4">FACÇÃO</h2>
+          <Badge 
+            style={{ backgroundColor: gang.color, color: '#fff' }}
+            className="text-lg px-4 py-2"
+          >
+            {gang.name}
+          </Badge>
+        </Card>
+      )}
+
+      {people.length > 0 && (
+        <Card className="p-6 bg-card border-border">
+          <h2 className="text-xl font-bold text-primary mb-4">PESSOAS ENVOLVIDAS ({people.length})</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {people.map((person) => person && (
+              <div
+                key={person.id}
+                className="flex items-center gap-3 p-3 bg-secondary rounded border border-border cursor-pointer hover:border-primary transition-all"
+                onClick={() => navigate(`/people/${person.id}`)}
+              >
+                {person.photoUrl && (
+                  <img
+                    src={person.photoUrl}
+                    alt={person.fullName}
+                    className="w-12 h-12 rounded object-cover"
+                  />
+                )}
+                <div className="flex-1">
+                  <p className="text-sm font-mono text-foreground">{person.fullName}</p>
+                  <p className="text-xs text-muted-foreground">{person.id}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {deep.attachments && deep.attachments.length > 0 && (
+        <Card className="p-6 bg-card border-border">
+          <h2 className="text-xl font-bold text-primary mb-4">ANEXOS ({deep.attachments.length})</h2>
+          <div className="space-y-2">
+            {deep.attachments.map((attachment) => (
+              <div
+                key={attachment.id}
+                className="flex items-center justify-between p-3 bg-secondary rounded border border-border"
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="h-5 w-5 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-mono text-foreground">{attachment.name}</p>
+                    <p className="text-xs text-muted-foreground">{attachment.type}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => window.open(attachment.url, '_blank')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = attachment.url;
+                      link.download = attachment.name;
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                    }}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
