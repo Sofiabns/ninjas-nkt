@@ -1,25 +1,30 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FileUpload } from "@/components/common/FileUpload";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Upload, X } from "lucide-react";
-import { fileToDataUrl } from "@/utils/validation";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
+import { X } from "lucide-react";
+import { Attachment } from "@/types";
 
 export default function DeepForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data, addDeep, updateDeep } = useApp();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [images, setImages] = useState<string[]>([]);
-  const [urlInput, setUrlInput] = useState("");
+  const [personIds, setPersonIds] = useState<string[]>([]);
+  const [gangId, setGangId] = useState<string>("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [personSearch, setPersonSearch] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -27,51 +32,56 @@ export default function DeepForm() {
       if (deep) {
         setTitle(deep.title);
         setDescription(deep.description);
-        setImages(deep.images);
+        setPersonIds(deep.personIds || []);
+        setGangId(deep.gangId || "");
+        setAttachments(deep.attachments || []);
       }
     }
   }, [id]);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const newImages: string[] = [];
-    for (let i = 0; i < files.length; i++) {
-      const dataUrl = await fileToDataUrl(files[i]);
-      newImages.push(dataUrl);
-    }
-
-    setImages([...images, ...newImages]);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const handleAddUrl = () => {
-    if (!urlInput.trim()) return;
-    setImages([...images, urlInput]);
-    setUrlInput("");
-  };
-
-  const removeImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim()) {
       toast.error("Preencha os campos obrigatórios");
       return;
     }
 
+    let uploadedAttachments: Attachment[] = [];
+
+    // 🚀 Upload de arquivos para o Supabase
+    for (const att of attachments) {
+      if (att.file) {
+        const url = await uploadFile(att.file, { deepId: id });
+        uploadedAttachments.push({
+          id: generateId("ATT", uploadedAttachments.map(a => a.id)),
+          name: att.file.name,
+          url,
+          type: att.file.type
+        });
+      } else if (att.url) {
+        uploadedAttachments.push(att);
+      }
+    }
+
+    // images vazias porque agora usamos attachments
+    const images: string[] = [];
+
     if (id) {
-      updateDeep(id, { title, description, images });
+      await updateDeep(id, { title, description, personIds, gangId, images, attachments: uploadedAttachments });
       toast.success("Deep atualizado");
     } else {
-      addDeep({ title, description, images });
+      await addDeep({ title, description, personIds, gangId, images, attachments: uploadedAttachments });
       toast.success("Deep criado");
     }
     navigate("/deeps");
   };
+
+  const filteredPeople = data.people.filter(
+    (p) =>
+      !personIds.includes(p.id) &&
+      (p.fullName.toLowerCase().includes(personSearch.toLowerCase()) ||
+        p.id.toLowerCase().includes(personSearch.toLowerCase()))
+  );
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -106,69 +116,74 @@ export default function DeepForm() {
           </div>
 
           <div>
-            <label className="text-sm font-mono text-foreground mb-2 block">IMAGENS</label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
+            <label className="text-sm font-mono text-foreground mb-2 block">PESSOAS ENVOLVIDAS</label>
+            <Input
+              value={personSearch}
+              onChange={(e) => setPersonSearch(e.target.value)}
+              placeholder="Buscar pessoa..."
+              className="bg-input border-border mb-2"
             />
-            
-            <div className="space-y-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full border-border hover:bg-secondary"
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Imagens
-              </Button>
 
-              <Input
-                value={urlInput}
-                onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="Ou cole uma URL de imagem..."
-                className="bg-input border-border"
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddUrl())}
-              />
-              
-              {urlInput && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleAddUrl}
-                  className="w-full border-border hover:bg-secondary"
-                >
-                  Adicionar URL
-                </Button>
-              )}
-            </div>
-
-            {images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                {images.map((img, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={img}
-                      alt={`Imagem ${index + 1}`}
-                      className="w-full h-32 object-cover rounded border border-border"
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
+            {personSearch && filteredPeople.length > 0 && (
+              <div className="mb-3 max-h-40 overflow-y-auto border border-border rounded bg-popover">
+                {filteredPeople.slice(0, 5).map((person) => (
+                  <button
+                    key={person.id}
+                    type="button"
+                    onClick={() => {
+                      setPersonIds([...personIds, person.id]);
+                      setPersonSearch("");
+                    }}
+                    className="w-full p-2 hover:bg-secondary text-left"
+                  >
+                    <p className="text-sm font-mono text-foreground">{person.fullName}</p>
+                    <p className="text-xs text-muted-foreground">{person.id}</p>
+                  </button>
                 ))}
               </div>
             )}
+
+            <div className="flex flex-wrap gap-2">
+              {personIds.map((personId) => {
+                const person = data.people.find((p) => p.id === personId);
+                return person ? (
+                  <div
+                    key={personId}
+                    className="flex items-center gap-2 px-3 py-1 bg-secondary border border-border rounded"
+                  >
+                    <span className="text-sm">{person.fullName}</span>
+                    <button
+                      type="button"
+                      onClick={() => setPersonIds(personIds.filter((id) => id !== personId))}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ) : null;
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">FACÇÃO</label>
+            <Select value={gangId} onValueChange={setGangId}>
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder="Selecione uma facção (opcional)" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border z-50">
+                <SelectItem value="">Nenhuma</SelectItem>
+                {data.gangs.map((gang) => (
+                  <SelectItem key={gang.id} value={gang.id}>
+                    {gang.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS</label>
+            <FileUpload attachments={attachments} onChange={setAttachments} />
           </div>
 
           <div className="flex gap-3 pt-4">

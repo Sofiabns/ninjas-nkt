@@ -79,7 +79,9 @@ export interface Base {
   id: string;
   name: string;
   description: string;
+  gangId?: string;
   images: string[];
+  attachments: Attachment[];
   metadata: Record<string, string>;
   createdAt: string;
 }
@@ -110,7 +112,10 @@ export interface Deep {
   id: string;
   title: string;
   description: string;
+  personIds: string[];
+  gangId?: string;
   images: string[];
+  attachments: Attachment[];
   createdAt: string;
 }
 

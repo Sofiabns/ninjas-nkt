@@ -214,7 +214,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: b.id,
               name: b.name,
               description: b.description,
+              gangId: b.gang_id,
               images: b.images || [],
+              attachments: b.attachments || [],
               metadata: b.metadata || {},
               createdAt: b.created_at
             })) || [],
@@ -233,7 +235,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: d.id,
               title: d.title,
               description: d.description,
+              personIds: d.person_ids || [],
+              gangId: d.gang_id,
               images: d.images || [],
+              attachments: d.attachments || [],
               createdAt: d.created_at
             })) || [],
             auctions: auctionsRes.data?.map(a => ({
@@ -769,7 +774,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: newBase.id,
       name: newBase.name,
       description: newBase.description,
+      gang_id: newBase.gangId,
       images: newBase.images,
+      attachments: newBase.attachments,
       metadata: newBase.metadata,
       created_at: newBase.createdAt
     });
@@ -787,7 +794,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updateData: any = {};
     if (base.name) updateData.name = base.name;
     if (base.description) updateData.description = base.description;
+    if (base.gangId !== undefined) updateData.gang_id = base.gangId;
     if (base.images) updateData.images = base.images;
+    if (base.attachments) updateData.attachments = base.attachments;
     if (base.metadata) updateData.metadata = base.metadata;
     
     const { error } = await supabase.from('bases').update(updateData).eq('id', id);
@@ -887,7 +896,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       id: newDeep.id,
       title: newDeep.title,
       description: newDeep.description,
+      person_ids: newDeep.personIds,
+      gang_id: newDeep.gangId,
       images: newDeep.images,
+      attachments: newDeep.attachments,
       created_at: newDeep.createdAt
     });
     
@@ -904,7 +916,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updateData: any = {};
     if (deep.title) updateData.title = deep.title;
     if (deep.description) updateData.description = deep.description;
+    if (deep.personIds) updateData.person_ids = deep.personIds;
+    if (deep.gangId !== undefined) updateData.gang_id = deep.gangId;
     if (deep.images) updateData.images = deep.images;
+    if (deep.attachments) updateData.attachments = deep.attachments;
     
     const { error } = await supabase.from('deeps').update(updateData).eq('id', id);
     
@@ -957,6 +972,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updateData: any = {};
     if (auction.title) updateData.title = auction.title;
     if (auction.entries) updateData.entries = auction.entries;
+    if (auction.attachments) updateData.attachments = auction.attachments;
     
     const { error } = await supabase.from('auctions').update(updateData).eq('id', id);
     

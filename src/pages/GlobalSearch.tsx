@@ -28,10 +28,15 @@ export default function GlobalSearch() {
   // Search vehicles
   const foundVehicles = searchTerm
     ? data.vehicles.filter(
-        (v) =>
-          v.plate.toLowerCase().includes(searchTerm) ||
-          v.model.toLowerCase().includes(searchTerm) ||
-          v.id.toLowerCase().includes(searchTerm)
+        (v) => {
+          const owner = data.people.find((p) => p.id === v.ownerId);
+          return (
+            v.plate.toLowerCase().includes(searchTerm) ||
+            v.model.toLowerCase().includes(searchTerm) ||
+            v.id.toLowerCase().includes(searchTerm) ||
+            (owner && owner.fullName.toLowerCase().includes(searchTerm))
+          );
+        }
       )
     : [];
 
@@ -77,10 +82,15 @@ export default function GlobalSearch() {
   // Search bases
   const foundBases = searchTerm
     ? data.bases.filter(
-        (b) =>
-          b.name.toLowerCase().includes(searchTerm) ||
-          b.description.toLowerCase().includes(searchTerm) ||
-          b.id.toLowerCase().includes(searchTerm)
+        (b) => {
+          const gang = b.gangId ? data.gangs.find((g) => g.id === b.gangId) : null;
+          return (
+            b.name.toLowerCase().includes(searchTerm) ||
+            b.description.toLowerCase().includes(searchTerm) ||
+            b.id.toLowerCase().includes(searchTerm) ||
+            (gang && gang.name.toLowerCase().includes(searchTerm))
+          );
+        }
       )
     : [];
 
@@ -97,10 +107,17 @@ export default function GlobalSearch() {
   // Search deeps
   const foundDeeps = searchTerm
     ? data.deeps.filter(
-        (d) =>
-          d.title.toLowerCase().includes(searchTerm) ||
-          d.description.toLowerCase().includes(searchTerm) ||
-          d.id.toLowerCase().includes(searchTerm)
+        (d) => {
+          const gang = d.gangId ? data.gangs.find((g) => g.id === d.gangId) : null;
+          const people = d.personIds?.map(pid => data.people.find(p => p.id === pid)).filter(Boolean) || [];
+          return (
+            d.title.toLowerCase().includes(searchTerm) ||
+            d.description.toLowerCase().includes(searchTerm) ||
+            d.id.toLowerCase().includes(searchTerm) ||
+            (gang && gang.name.toLowerCase().includes(searchTerm)) ||
+            people.some(p => p?.fullName.toLowerCase().includes(searchTerm))
+          );
+        }
       )
     : [];
 
@@ -405,24 +422,33 @@ export default function GlobalSearch() {
             <Building className="h-5 w-5" />
             BASES ({foundBases.length})
           </h2>
-          {foundBases.map((base) => (
-            <motion.div
-              key={base.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Card
-                className="p-4 bg-card border-border hover:border-primary transition-all cursor-pointer"
-                onClick={() => navigate(`/bases/${base.id}`)}
+          {foundBases.map((base) => {
+            const gang = base.gangId ? data.gangs.find((g) => g.id === base.gangId) : null;
+            
+            return (
+              <motion.div
+                key={base.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-accent font-mono text-sm">{base.id}</span>
-                  <h3 className="text-lg font-bold text-foreground">{base.name}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">{base.description}</p>
-              </Card>
-            </motion.div>
-          ))}
+                <Card
+                  className="p-4 bg-card border-border hover:border-primary transition-all cursor-pointer"
+                  onClick={() => navigate(`/bases/${base.id}`)}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-accent font-mono text-sm">{base.id}</span>
+                    <h3 className="text-lg font-bold text-foreground">{base.name}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{base.description}</p>
+                  {gang && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Facção: <span style={{ color: gang.color || "inherit" }}>{gang.name}</span>
+                    </p>
+                  )}
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       )}
 
@@ -461,24 +487,44 @@ export default function GlobalSearch() {
             <Building className="h-5 w-5" />
             DEEPS ({foundDeeps.length})
           </h2>
-          {foundDeeps.map((deep) => (
-            <motion.div
-              key={deep.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-            >
-              <Card
-                className="p-4 bg-card border-border hover:border-primary transition-all cursor-pointer"
-                onClick={() => navigate(`/deeps/${deep.id}`)}
+          {foundDeeps.map((deep) => {
+            const gang = deep.gangId ? data.gangs.find((g) => g.id === deep.gangId) : null;
+            const people = deep.personIds?.map(pid => data.people.find(p => p.id === pid)).filter(Boolean) || [];
+            
+            return (
+              <motion.div
+                key={deep.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-accent font-mono text-sm">{deep.id}</span>
-                  <h3 className="text-lg font-bold text-foreground">{deep.title}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground line-clamp-2">{deep.description}</p>
-              </Card>
-            </motion.div>
-          ))}
+                <Card
+                  className="p-4 bg-card border-border hover:border-primary transition-all cursor-pointer"
+                  onClick={() => navigate(`/deeps/${deep.id}`)}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-accent font-mono text-sm">{deep.id}</span>
+                    <h3 className="text-lg font-bold text-foreground">{deep.title}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{deep.description}</p>
+                  {gang && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Facção: <span style={{ color: gang.color || "inherit" }}>{gang.name}</span>
+                    </p>
+                  )}
+                  {people.length > 0 && (
+                    <div className="flex items-center gap-2 flex-wrap mt-2">
+                      <span className="text-xs text-muted-foreground">Pessoas:</span>
+                      {people.map((p) => p && (
+                        <Badge key={p.id} variant="outline" className="text-xs">
+                          {p.fullName}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       )}
 
