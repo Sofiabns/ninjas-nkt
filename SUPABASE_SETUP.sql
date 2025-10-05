@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS people (
   gang TEXT NOT NULL,
   hierarchy TEXT NOT NULL CHECK (hierarchy IN ('Lider', 'Sub-Lider', 'Membro')),
   phone TEXT NOT NULL,
-  photo_url TEXT,
+  attachments JSONB DEFAULT '[]',
   vehicle_ids TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
   id TEXT PRIMARY KEY,
   plate TEXT NOT NULL,
   model TEXT NOT NULL,
-  photo_url TEXT,
+  attachments JSONB DEFAULT '[]',
   owner_id TEXT,
   gang_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS bases (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  images TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS deeps (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
-  images TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
