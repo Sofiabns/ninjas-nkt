@@ -170,8 +170,8 @@ export default function PersonForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border z-50">
-                <SelectItem value="Líder">Líder</SelectItem>
-                <SelectItem value="Sub-Líder">Sub-Líder</SelectItem>
+                <SelectItem value="Lider">Lider</SelectItem>
+                <SelectItem value="Sub-Lider">Sub-Lider</SelectItem>
                 <SelectItem value="Membro">Membro</SelectItem>
               </SelectContent>
             </Select>
