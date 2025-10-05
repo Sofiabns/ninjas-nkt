@@ -26,7 +26,7 @@ export default function GangDetails() {
     );
   }
 
-  const members = data.people.filter((p) => p.gang === gang.name);
+  const members = data.people.filter((p) => p.gang === gang.name && (p.hierarchy === "Lider" || p.hierarchy === "Sub-Lider" || p.hierarchy === "Membro"));
 
   return (
     <div className="space-y-6">
