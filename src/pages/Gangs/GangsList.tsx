@@ -28,8 +28,8 @@ export default function GangsList() {
 
   const getGangMembers = (gangName: string) => {
     const members = data.people.filter((p) => p.gang === gangName);
-    const leaders = members.filter((m) => m.hierarchy === "Líder");
-    const subLeaders = members.filter((m) => m.hierarchy === "Sub-Líder");
+    const leaders = members.filter((m) => m.hierarchy === "Lider");
+    const subLeaders = members.filter((m) => m.hierarchy === "Sub-Lider");
     const regularMembers = members.filter((m) => m.hierarchy === "Membro");
     return [...leaders, ...subLeaders, ...regularMembers];
   };

@@ -26,7 +26,12 @@ export default function GangDetails() {
     );
   }
 
-  const members = data.people.filter((p) => p.gang === gang.name && (p.hierarchy === "Lider" || p.hierarchy === "Sub-Lider" || p.hierarchy === "Membro"));
+  const members = data.people
+    .filter((p) => p.gang === gang.name && (p.hierarchy === "Lider" || p.hierarchy === "Sub-Lider" || p.hierarchy === "Membro"))
+    .sort((a, b) => {
+      const hierarchyOrder: Record<string, number> = { "Lider": 1, "Sub-Lider": 2, "Membro": 3 };
+      return (hierarchyOrder[a.hierarchy] || 99) - (hierarchyOrder[b.hierarchy] || 99);
+    });
 
   return (
     <div className="space-y-6">
