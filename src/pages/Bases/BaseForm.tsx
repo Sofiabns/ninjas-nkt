@@ -49,7 +49,7 @@ export default function BaseForm() {
     // images vazias porque agora usamos attachments
     const images: string[] = [];
 
-    await addBase({ name, description, gangId, images, attachments: uploadedAttachments, metadata: {} });
+    await addBase({ name, description, gangId, attachments: uploadedAttachments, metadata: {} });
     toast.success("Base criada");
     navigate("/bases");
   };
