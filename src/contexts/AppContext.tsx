@@ -159,7 +159,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               gang: p.gang,
               hierarchy: p.hierarchy as "Lider" | "Sub-Lider" | "Membro",
               phone: p.phone,
-              photoUrl: p.photo_url,
+              attachments: p.attachments || [],
               vehicleIds: p.vehicle_ids || [],
               createdAt: p.created_at
             })) || [],
@@ -167,7 +167,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: v.id,
               plate: v.plate,
               model: v.model,
-              photoUrl: v.photo_url,
+              attachments: v.attachments || [],
               ownerId: v.owner_id,
               gangId: v.gang_id,
               createdAt: v.created_at
@@ -395,7 +395,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       gang: newPerson.gang,
       hierarchy: newPerson.hierarchy,
       phone: newPerson.phone,
-      photo_url: newPerson.photoUrl,
+      attachments: newPerson.attachments,
       vehicle_ids: newPerson.vehicleIds,
       created_at: newPerson.createdAt
     });
@@ -415,7 +415,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (person.gang) updateData.gang = person.gang;
     if (person.hierarchy) updateData.hierarchy = person.hierarchy;
     if (person.phone) updateData.phone = person.phone;
-    if (person.photoUrl !== undefined) updateData.photo_url = person.photoUrl;
+    if (person.attachments !== undefined) updateData.attachments = person.attachments;
     if (person.vehicleIds) updateData.vehicle_ids = person.vehicleIds;
 
     const { error } = await supabase.from('people').update(updateData).eq('id', id);
@@ -450,22 +450,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addVehicle = async (vehicle: Omit<Vehicle, "id" | "createdAt">) => {
     const id = generateId("V", data.vehicles.map((v) => v.id));
     const newVehicle: Vehicle = { ...vehicle, id, createdAt: new Date().toISOString() };
-    
+
     const { error } = await supabase.from('vehicles').insert({
       id: newVehicle.id,
       plate: newVehicle.plate,
       model: newVehicle.model,
-      photo_url: newVehicle.photoUrl,
+      attachments: newVehicle.attachments,
       owner_id: newVehicle.ownerId,
       gang_id: newVehicle.gangId,
       created_at: newVehicle.createdAt
     });
-    
+
     if (error) {
       toast.error('Erro ao adicionar veículo');
       return;
     }
-    
+
     setData((prev) => ({ ...prev, vehicles: [...prev.vehicles, newVehicle] }));
     addActivityLog("Adicionou veículo", "Vehicle", id);
   };
@@ -474,17 +474,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updateData: any = {};
     if (vehicle.plate) updateData.plate = vehicle.plate;
     if (vehicle.model) updateData.model = vehicle.model;
-    if (vehicle.photoUrl !== undefined) updateData.photo_url = vehicle.photoUrl;
+    if (vehicle.attachments !== undefined) updateData.attachments = vehicle.attachments;
     if (vehicle.ownerId !== undefined) updateData.owner_id = vehicle.ownerId;
     if (vehicle.gangId !== undefined) updateData.gang_id = vehicle.gangId;
-    
+
     const { error } = await supabase.from('vehicles').update(updateData).eq('id', id);
-    
+
     if (error) {
       toast.error('Erro ao atualizar veículo');
       return;
     }
-    
+
     setData((prev) => ({
       ...prev,
       vehicles: prev.vehicles.map((v) => (v.id === id ? { ...v, ...vehicle } : v)),

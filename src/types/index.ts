@@ -1,7 +1,7 @@
 export interface Investigator {
   id: string;
   name: string;
-  photoUrl?: string;
+  attachments: Attachment[];
 }
 
 export interface Person {
@@ -10,7 +10,7 @@ export interface Person {
   gang: string;
   hierarchy: "Lider" | "Sub-Lider" | "Membro";
   phone: string;
-  photoUrl?: string;
+  attachments: Attachment[];
   vehicleIds: string[];
   createdAt: string;
 }
@@ -19,7 +19,7 @@ export interface Vehicle {
   id: string;
   plate: string;
   model: string;
-  photoUrl?: string;
+  attachments: Attachment[];
   ownerId?: string;
   gangId?: string;
   createdAt: string;
