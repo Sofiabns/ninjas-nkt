@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { formatPhone, validatePhone, fileToDataUrl } from "@/utils/validation";
+import { formatPhone, validatePhone } from "@/utils/validation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
 
 export default function PersonForm() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function PersonForm() {
   const [phone, setPhone] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -43,9 +45,18 @@ export default function PersonForm() {
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const dataUrl = await fileToDataUrl(file);
-      setPhotoUrl(dataUrl);
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadFile(file, { personId: id || "new" });
+      setPhotoUrl(url);
+      toast.success("Foto enviada com sucesso");
+    } catch (error) {
+      console.error("Erro ao fazer upload:", error);
+      toast.error("Erro ao enviar foto");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -104,9 +115,19 @@ export default function PersonForm() {
                 type="button"
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
               >
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Foto
+                {isUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Enviando...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Foto
+                  </>
+                )}
               </Button>
             </div>
           </div>
