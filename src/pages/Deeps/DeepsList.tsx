@@ -60,9 +60,9 @@ export default function DeepsList() {
           >
             <Card className="p-4 bg-card border-border hover:border-primary transition-all">
               <div className="aspect-video bg-secondary rounded mb-3 overflow-hidden">
-                {deep.images.length > 0 ? (
+                {deep.attachments.length > 0 ? (
                   <img
-                    src={deep.images[0]}
+                    src={deep.attachments[0].url}
                     alt={deep.title}
                     className="w-full h-full object-cover"
                   />
@@ -79,7 +79,7 @@ export default function DeepsList() {
                   <p className="text-xs text-accent font-mono">{deep.id}</p>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2">{deep.description}</p>
-                <p className="text-xs text-muted-foreground">{deep.images.length} imagem(ns)</p>
+                <p className="text-xs text-muted-foreground">{deep.attachments.length} imagem(ns)</p>
               </div>
 
               <div className="flex gap-2 mt-3">

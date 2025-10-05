@@ -60,9 +60,9 @@ export default function BasesList() {
           >
             <Card className="p-4 bg-card border-border hover:border-primary transition-all">
               <div className="aspect-video bg-secondary rounded mb-3 overflow-hidden">
-                {base.images.length > 0 ? (
+                {base.attachments.length > 0 ? (
                   <img
-                    src={base.images[0]}
+                    src={base.attachments[0].url}
                     alt={base.name}
                     className="w-full h-full object-cover"
                   />
@@ -79,7 +79,7 @@ export default function BasesList() {
                   <p className="text-xs text-accent font-mono">{base.id}</p>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-2">{base.description}</p>
-                <p className="text-xs text-muted-foreground">{base.images.length} imagem(ns)</p>
+                <p className="text-xs text-muted-foreground">{base.attachments.length} imagem(ns)</p>
               </div>
 
               <div className="flex gap-2 mt-3">
