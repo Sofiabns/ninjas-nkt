@@ -22,7 +22,7 @@ export default function DeepForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [personIds, setPersonIds] = useState<string[]>([]);
-  const [gangId, setGangId] = useState<string>("");
+  const [gangId, setGangId] = useState<string>("none");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [personSearch, setPersonSearch] = useState("");
 
@@ -33,7 +33,7 @@ export default function DeepForm() {
         setTitle(deep.title);
         setDescription(deep.description);
         setPersonIds(deep.personIds || []);
-        setGangId(deep.gangId || "");
+        setGangId(deep.gangId || "none");
         setAttachments(deep.attachments || []);
       }
     }
@@ -66,11 +66,13 @@ export default function DeepForm() {
     // images vazias porque agora usamos attachments
     const images: string[] = [];
 
+    const finalGangId = gangId === "none" ? undefined : gangId;
+
     if (id) {
-      await updateDeep(id, { title, description, personIds, gangId, images, attachments: uploadedAttachments });
+      await updateDeep(id, { title, description, personIds, gangId: finalGangId, images, attachments: uploadedAttachments });
       toast.success("Deep atualizado");
     } else {
-      await addDeep({ title, description, personIds, gangId, images, attachments: uploadedAttachments });
+      await addDeep({ title, description, personIds, gangId: finalGangId, images, attachments: uploadedAttachments });
       toast.success("Deep criado");
     }
     navigate("/deeps");
@@ -171,7 +173,7 @@ export default function DeepForm() {
                 <SelectValue placeholder="Selecione uma facção (opcional)" />
               </SelectTrigger>
               <SelectContent className="bg-popover border-border z-50">
-                <SelectItem value="">Nenhuma</SelectItem>
+                <SelectItem value="none">Nenhuma</SelectItem>
                 {data.gangs.map((gang) => (
                   <SelectItem key={gang.id} value={gang.id}>
                     {gang.name}

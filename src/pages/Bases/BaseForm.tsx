@@ -19,7 +19,7 @@ export default function BaseForm() {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [gangId, setGangId] = useState<string>("");
+  const [gangId, setGangId] = useState<string>("none");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,14 +89,14 @@ export default function BaseForm() {
               <SelectTrigger className="bg-input border-border">
                 <SelectValue placeholder="Selecione uma facção (opcional)" />
               </SelectTrigger>
-              <SelectContent className="bg-popover border-border z-50">
-                <SelectItem value="">Nenhuma</SelectItem>
-                {data.gangs.map((gang) => (
-                  <SelectItem key={gang.id} value={gang.id}>
-                    {gang.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+            <SelectContent className="bg-popover border-border z-50">
+              <SelectItem value="none">Nenhuma</SelectItem>
+              {data.gangs.map((gang) => (
+                <SelectItem key={gang.id} value={gang.id}>
+                  {gang.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
             </Select>
           </div>
 
