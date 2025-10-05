@@ -7,6 +7,7 @@ export async function uploadFile(file: File, options: {
   personId?: string;
   meetingId?: string;
   auctionId?: string;
+  vehicleId?: string;
 }) {
   const filePath = `uploads/${Date.now()}_${file.name}`;
 
@@ -32,6 +33,7 @@ export async function uploadFile(file: File, options: {
     person_id: options.personId || null,
     meeting_id: options.meetingId || null,
     auction_id: options.auctionId || null,
+    vehicle_id: options.vehicleId || null,
   });
 
   if (dbError) throw dbError;
@@ -58,6 +60,7 @@ export async function getUploadsByEntity(entityType: string, entityId: string) {
     person: 'person_id',
     meeting: 'meeting_id',
     auction: 'auction_id',
+    vehicle: 'vehicle_id',
   };
 
   const column = columnMap[entityType as keyof typeof columnMap];
@@ -90,4 +93,9 @@ export async function getUploadsByMeeting(id: string) {
 // Buscar uploads vinculados a um leilão
 export async function getUploadsByAuction(id: string) {
   return getUploadsByEntity('auction', id);
+}
+
+// Buscar uploads vinculados a um veículo
+export async function getUploadsByVehicle(id: string) {
+  return getUploadsByEntity('vehicle', id);
 }

@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { formatPlate, validatePlate, fileToDataUrl } from "@/utils/validation";
+import { formatPlate, validatePlate } from "@/utils/validation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload } from "lucide-react";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
 
 export default function VehicleForm() {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ export default function VehicleForm() {
   const [model, setModel] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [ownerId, setOwnerId] = useState<string>("");
+  const [gangId, setGangId] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -29,6 +32,7 @@ export default function VehicleForm() {
         setModel(vehicle.model);
         setPhotoUrl(vehicle.photoUrl || "");
         setOwnerId(vehicle.ownerId || "");
+        setGangId(vehicle.gangId || "");
       }
     }
   }, [id]);
@@ -40,8 +44,17 @@ export default function VehicleForm() {
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const dataUrl = await fileToDataUrl(file);
-      setPhotoUrl(dataUrl);
+      try {
+        setIsUploading(true);
+        const url = await uploadFile(file, { vehicleId: id });
+        setPhotoUrl(url);
+        toast.success("Foto enviada com sucesso");
+      } catch (error) {
+        console.error('Erro no upload:', error);
+        toast.error("Erro ao enviar foto");
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -58,10 +71,10 @@ export default function VehicleForm() {
     }
 
     if (id) {
-      updateVehicle(id, { plate, model, photoUrl, ownerId: ownerId || undefined });
+      updateVehicle(id, { plate, model, photoUrl, ownerId: ownerId || undefined, gangId: gangId || undefined });
       toast.success("Veículo atualizado");
     } else {
-      addVehicle({ plate, model, photoUrl, ownerId: ownerId || undefined });
+      addVehicle({ plate, model, photoUrl, ownerId: ownerId || undefined, gangId: gangId || undefined });
       toast.success("Veículo registrado");
     }
     navigate("/vehicles");
@@ -100,9 +113,10 @@ export default function VehicleForm() {
                 type="button"
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Upload Foto
+                {isUploading ? "Enviando..." : "Upload Foto"}
               </Button>
             </div>
           </div>
@@ -148,6 +162,28 @@ export default function VehicleForm() {
                 {(data?.people ?? []).map((person) => (
                   <SelectItem key={person.id} value={person.id}>
                     {person.fullName} ({person.id})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">
+              FACÇÃO (OPCIONAL)
+            </label>
+            <Select
+              value={gangId === "" ? "none" : gangId}
+              onValueChange={(value) => setGangId(value === "none" ? "" : value)}
+            >
+              <SelectTrigger className="bg-input border-border">
+                <SelectValue placeholder="Selecione a facção" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover border-border z-50">
+                <SelectItem value="none">Nenhuma</SelectItem>
+                {(data?.gangs ?? []).map((gang) => (
+                  <SelectItem key={gang.id} value={gang.id}>
+                    {gang.name}
                   </SelectItem>
                 ))}
               </SelectContent>

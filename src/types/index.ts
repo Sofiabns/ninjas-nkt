@@ -21,6 +21,7 @@ export interface Vehicle {
   model: string;
   photoUrl?: string;
   ownerId?: string;
+  gangId?: string;
   createdAt: string;
 }
 
