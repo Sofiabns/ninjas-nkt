@@ -157,7 +157,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: p.id,
               fullName: p.full_name,
               gang: p.gang,
-              hierarchy: p.hierarchy as "Líder" | "Sub-Líder" | "Membro",
+              hierarchy: p.hierarchy as "Lider" | "Sub-Lider" | "Membro",
               phone: p.phone,
               photoUrl: p.photo_url,
               vehicleIds: p.vehicle_ids || [],

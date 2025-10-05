@@ -8,7 +8,7 @@ export interface Person {
   id: string;
   fullName: string;
   gang: string;
-  hierarchy: "Líder" | "Sub-Líder" | "Membro";
+  hierarchy: "Lider" | "Sub-Lider" | "Membro";
   phone: string;
   photoUrl?: string;
   vehicleIds: string[];

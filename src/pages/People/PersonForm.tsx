@@ -18,7 +18,7 @@ export default function PersonForm() {
 
   const [fullName, setFullName] = useState("");
   const [gang, setGang] = useState("");
-  const [hierarchy, setHierarchy] = useState<"Líder" | "Sub-Líder" | "Membro">("Membro");
+  const [hierarchy, setHierarchy] = useState<"Lider" | "Sub-Lider" | "Membro">("Membro");
   const [phone, setPhone] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
@@ -142,7 +142,7 @@ export default function PersonForm() {
             <label className="text-sm font-mono text-foreground mb-2 block">HIERARQUIA *</label>
             <Select
               value={hierarchy}
-              onValueChange={(val) => setHierarchy(val as "Líder" | "Sub-Líder" | "Membro")}
+              onValueChange={(val) => setHierarchy(val as "Lider" | "Sub-Lider" | "Membro")}
               required
             >
               <SelectTrigger className="bg-input border-border">
