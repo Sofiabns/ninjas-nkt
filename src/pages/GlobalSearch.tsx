@@ -224,6 +224,16 @@ export default function GlobalSearch() {
                             ))}
                           </div>
                         )}
+                        {person.deeps && person.deeps.length > 0 && (
+                          <div className="flex items-center gap-2 flex-wrap mt-2">
+                            <span className="text-xs text-muted-foreground">Deeps:</span>
+                            {person.deeps.map((deep, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">
+                                {deep}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
