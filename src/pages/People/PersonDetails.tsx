@@ -77,6 +77,12 @@ export default function PersonDetails() {
               <p className="text-xs font-mono text-accent mb-1">TELEFONE</p>
               <p className="text-foreground font-mono">{person.phone}</p>
             </div>
+            {person.deep && (
+              <div>
+                <p className="text-xs font-mono text-accent mb-1">DEEP</p>
+                <p className="text-foreground">{person.deep}</p>
+              </div>
+            )}
           </div>
         </Card>
 

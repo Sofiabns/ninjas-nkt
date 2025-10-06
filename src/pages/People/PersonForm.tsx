@@ -17,6 +17,7 @@ export default function PersonForm() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { data, addPerson, updatePerson, getPerson } = useApp();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [fullName, setFullName] = useState("");
@@ -24,6 +25,7 @@ export default function PersonForm() {
   const [hierarchy, setHierarchy] = useState<"Lider" | "Sub-Lider" | "Membro">("Membro");
   const [phone, setPhone] = useState("");
   const [deep, setDeep] = useState("");
+
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -77,10 +79,10 @@ export default function PersonForm() {
     }
 
     if (id) {
-      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds, deep });
+      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds, deep: deep || undefined });
       toast.success("Pessoa atualizada");
     } else {
-      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds, deep });
+      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds, deep: deep || undefined });
       toast.success("Pessoa registrada");
     }
     navigate("/people");

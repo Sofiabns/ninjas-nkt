@@ -113,6 +113,7 @@ export default function PeopleList() {
                   <p className="text-xs text-accent font-mono">{person.id}</p>
                   <p className="text-xs text-muted-foreground mt-1">{person.gang}</p>
                   <p className="text-xs text-muted-foreground">{person.hierarchy}</p>
+                  {person.deep && <p className="text-xs text-muted-foreground">Deep: {person.deep}</p>}
                   <p className="text-xs text-muted-foreground font-mono mt-1">{person.phone}</p>
                 </div>
               </div>
