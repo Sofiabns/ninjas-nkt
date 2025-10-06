@@ -21,7 +21,8 @@ export default function GlobalSearch() {
           p.fullName.toLowerCase().includes(searchTerm) ||
           p.phone.includes(searchTerm) ||
           p.id.toLowerCase().includes(searchTerm) ||
-          p.gang.toLowerCase().includes(searchTerm)
+          p.gang.toLowerCase().includes(searchTerm) ||
+          (p.deep && p.deep.toLowerCase().includes(searchTerm))
       )
     : [];
 
