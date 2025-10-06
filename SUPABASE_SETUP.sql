@@ -121,8 +121,9 @@ CREATE TABLE IF NOT EXISTS deeps (
 CREATE TABLE IF NOT EXISTS auctions (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
-  entries JSONB DEFAULT '[]',
   description TEXT,
+  entries JSONB DEFAULT '[]',
+  attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -197,6 +198,7 @@ ALTER TABLE investigations ADD COLUMN IF NOT EXISTS faction_ids TEXT[] DEFAULT '
 
 
 ALTER TABLE people ADD COLUMN IF NOT EXISTS deep TEXT;
+ALTER TABLE auctions ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES

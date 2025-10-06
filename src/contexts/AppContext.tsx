@@ -952,7 +952,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Auctions methods
   const addAuction = async (auction: Omit<Auction, "id" | "createdAt">) => {
     const id = generateId("A", data.auctions.map((a) => a.id));
-    const newAuction: Auction = { ...auction, id, createdAt: new Date().toISOString() };
+    const newAuction: Auction = {
+      ...auction,
+      id,
+      createdAt: new Date().toISOString(),
+      entries: Array.isArray(auction.entries) ? auction.entries : [],
+      attachments: Array.isArray(auction.attachments) ? auction.attachments : []
+    };
+
+    console.log('Creating auction with data:', {
+      id: newAuction.id,
+      title: newAuction.title,
+      description: newAuction.description,
+      entries: newAuction.entries,
+      attachments: newAuction.attachments,
+      created_at: newAuction.createdAt
+    });
 
     const { error } = await supabase.from('auctions').insert({
       id: newAuction.id,
@@ -964,6 +979,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     if (error) {
+      console.error('Supabase insert error:', error);
       toast.error('Erro ao criar leilão');
       return;
     }
