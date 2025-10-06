@@ -3,14 +3,14 @@ import { AppData, Investigator } from "@/types";
 const STORAGE_KEY = "ninjas_nkt_data";
 
 const defaultInvestigators: Investigator[] = [
-  { id: "N-00", name: "Kitsune" },
-  { id: "N-01", name: "Hinata" },
-  { id: "N-02", name: "Luciano" },
-  { id: "N-03", name: "Miranda" },
-  { id: "N-04", name: "Eloa" },
-  { id: "N-05", name: "Lua" },
-  { id: "N-06", name: "Hiro" },
-  { id: "N-07", name: "Lara" },
+  { id: "N-00", name: "Kitsune", attachments: [] },
+  { id: "N-01", name: "Hinata", attachments: [] },
+  { id: "N-02", name: "Luciano", attachments: [] },
+  { id: "N-03", name: "Miranda", attachments: [] },
+  { id: "N-04", name: "Eloa", attachments: [] },
+  { id: "N-05", name: "Lua", attachments: [] },
+  { id: "N-06", name: "Hiro", attachments: [] },
+  { id: "N-07", name: "Lara", attachments: [] },
 ];
 
 export const getDefaultData = (): AppData => ({
