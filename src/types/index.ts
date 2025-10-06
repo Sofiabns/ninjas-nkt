@@ -62,6 +62,7 @@ export interface Investigation {
   title: string;
   sections: { label: string; content: string }[];
   personIds: string[];
+  factionIds?: string[];
   attachments: Attachment[];
   createdAt: string;
 }

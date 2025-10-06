@@ -16,15 +16,17 @@ import { generateId } from "@/utils/idGenerator";
 export default function InvestigationForm() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { data, addInvestigation, updateInvestigation, getInvestigation, getPerson } = useApp();
+  const { data, addInvestigation, updateInvestigation, getInvestigation, getPerson, getGang } = useApp();
 
   const [title, setTitle] = useState("");
   const [sections, setSections] = useState<{ label: string; content: string }[]>(
     [{ label: "Resumo", content: "" }],
   );
   const [personIds, setPersonIds] = useState<string[]>([]);
+  const [factionIds, setFactionIds] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [personSearch, setPersonSearch] = useState("");
+  const [factionSearch, setFactionSearch] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -33,6 +35,7 @@ export default function InvestigationForm() {
         setTitle(investigation.title);
         setSections(investigation.sections);
         setPersonIds(investigation.personIds);
+        setFactionIds(investigation.factionIds || []);
         setAttachments(investigation.attachments);
       }
     }
@@ -67,6 +70,7 @@ export default function InvestigationForm() {
         title,
         sections,
         personIds,
+        factionIds,
         attachments: uploadedAttachments,
       });
       toast.success("Investigação atualizada");
@@ -75,6 +79,7 @@ export default function InvestigationForm() {
         title,
         sections,
         personIds,
+        factionIds,
         attachments: uploadedAttachments,
       });
       toast.success("Investigação criada");
@@ -101,6 +106,13 @@ export default function InvestigationForm() {
       !personIds.includes(p.id) &&
       (p.fullName.toLowerCase().includes(personSearch.toLowerCase()) ||
         p.id.toLowerCase().includes(personSearch.toLowerCase()))
+  );
+
+  const filteredFactions = data.gangs.filter(
+    (g) =>
+      !factionIds.includes(g.id) &&
+      (g.name.toLowerCase().includes(factionSearch.toLowerCase()) ||
+        g.id.toLowerCase().includes(factionSearch.toLowerCase()))
   );
 
   return (
@@ -165,73 +177,128 @@ export default function InvestigationForm() {
             </div>
           </div>
 
-          <div>
-            <label className="text-sm font-mono text-foreground mb-2 block">
-              PESSOAS ENVOLVIDAS
-            </label>
-            <Input
-              value={personSearch}
-              onChange={(e) => setPersonSearch(e.target.value)}
-              placeholder="Buscar pessoa por nome ou ID..."
-              className="bg-input border-border mb-2"
-            />
+            <div>
+              <label className="text-sm font-mono text-foreground mb-2 block">
+                PESSOAS ENVOLVIDAS
+              </label>
+              <Input
+                value={personSearch}
+                onChange={(e) => setPersonSearch(e.target.value)}
+                placeholder="Buscar pessoa por nome ou ID..."
+                className="bg-input border-border mb-2"
+              />
 
-            {personSearch && filteredPeople.length > 0 && (
-              <div className="mb-3 max-h-40 overflow-y-auto border border-border rounded bg-popover">
-                {filteredPeople.slice(0, 5).map((person) => (
-                  <button
-                    key={person.id}
-                    type="button"
-                    onClick={() => {
-                      setPersonIds([...personIds, person.id]);
-                      setPersonSearch("");
-                    }}
-                    className="w-full p-2 hover:bg-secondary text-left flex items-center gap-2"
-                  >
-                    {person.attachments.length > 0 && (
-                      <img
-                        src={person.attachments[0].url}
-                        alt={person.fullName}
-                        className="w-8 h-8 rounded object-cover"
-                      />
-                    )}
-                    <div>
-                      <p className="text-sm font-mono text-foreground">{person.fullName}</p>
-                      <p className="text-xs text-muted-foreground">{person.id}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              {personIds.map((personId) => {
-                const person = getPerson(personId);
-                return person ? (
-                  <div
-                    key={personId}
-                    className="flex items-center gap-2 px-3 py-1 bg-secondary border border-border rounded"
-                  >
-                    {person.attachments.length > 0 && (
-                      <img
-                        src={person.attachments[0].url}
-                        alt={person.fullName}
-                        className="w-6 h-6 rounded object-cover"
-                      />
-                    )}
-                    <span className="text-sm">{person.fullName}</span>
+              {personSearch && filteredPeople.length > 0 && (
+                <div className="mb-3 max-h-40 overflow-y-auto border border-border rounded bg-popover">
+                  {filteredPeople.slice(0, 5).map((person) => (
                     <button
+                      key={person.id}
                       type="button"
-                      onClick={() => setPersonIds(personIds.filter((id) => id !== personId))}
-                      className="ml-1"
+                      onClick={() => {
+                        setPersonIds([...personIds, person.id]);
+                        setPersonSearch("");
+                      }}
+                      className="w-full p-2 hover:bg-secondary text-left flex items-center gap-2"
                     >
-                      <X className="h-3 w-3" />
+                      {person.attachments.length > 0 && (
+                        <img
+                          src={person.attachments[0].url}
+                          alt={person.fullName}
+                          className="w-8 h-8 rounded object-cover"
+                        />
+                      )}
+                      <div>
+                        <p className="text-sm font-mono text-foreground">{person.fullName}</p>
+                        <p className="text-xs text-muted-foreground">{person.id}</p>
+                      </div>
                     </button>
-                  </div>
-                ) : null;
-              })}
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {personIds.map((personId) => {
+                  const person = getPerson(personId);
+                  return person ? (
+                    <div
+                      key={personId}
+                      className="flex items-center gap-2 px-3 py-1 bg-secondary border border-border rounded"
+                    >
+                      {person.attachments.length > 0 && (
+                        <img
+                          src={person.attachments[0].url}
+                          alt={person.fullName}
+                          className="w-6 h-6 rounded object-cover"
+                        />
+                      )}
+                      <span className="text-sm">{person.fullName}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPersonIds(personIds.filter((id) => id !== personId))}
+                        className="ml-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : null;
+                })}
+              </div>
             </div>
-          </div>
+
+            {/* New Factions involved section */}
+            <div>
+              <label className="text-sm font-mono text-foreground mb-2 block">
+                FACÇÕES ENVOLVIDAS
+              </label>
+              <Input
+                value={factionSearch}
+                onChange={(e) => setFactionSearch(e.target.value)}
+                placeholder="Buscar facção por nome ou ID..."
+                className="bg-input border-border mb-2"
+              />
+
+              {factionSearch && filteredFactions.length > 0 && (
+                <div className="mb-3 max-h-40 overflow-y-auto border border-border rounded bg-popover">
+                  {filteredFactions.slice(0, 5).map((faction) => (
+                    <button
+                      key={faction.id}
+                      type="button"
+                      onClick={() => {
+                        setFactionIds([...factionIds, faction.id]);
+                        setFactionSearch("");
+                      }}
+                      className="w-full p-2 hover:bg-secondary text-left flex items-center gap-2"
+                    >
+                      <div>
+                        <p className="text-sm font-mono text-foreground">{faction.name}</p>
+                        <p className="text-xs text-muted-foreground">{faction.id}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                {factionIds.map((factionId) => {
+                  const faction = getGang(factionId);
+                  return faction ? (
+                    <div
+                      key={factionId}
+                      className="flex items-center gap-2 px-3 py-1 bg-secondary border border-border rounded"
+                    >
+                      <span className="text-sm">{faction.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setFactionIds(factionIds.filter((id) => id !== factionId))}
+                        className="ml-1"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            </div>
 
           <div>
             <label className="text-sm font-mono text-foreground mb-2 block">ANEXOS</label>
