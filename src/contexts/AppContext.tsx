@@ -974,10 +974,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateAuction = async (id: string, auction: Partial<Auction>) => {
     const updateData: any = {};
-    if (auction.title) updateData.title = auction.title;
+    if (auction.title !== undefined) updateData.title = auction.title;
     if (auction.description !== undefined) updateData.description = auction.description;
-    if (auction.entries) updateData.entries = auction.entries;
-    if (auction.attachments) updateData.attachments = auction.attachments;
+    if (auction.entries !== undefined) updateData.entries = auction.entries;
+    if (auction.attachments !== undefined) updateData.attachments = auction.attachments;
+
+    // Only update if there are fields to update
+    if (Object.keys(updateData).length === 0) {
+      console.warn('No fields to update for auction', id);
+      return;
+    }
 
     const { error } = await supabase.from('auctions').update(updateData).eq('id', id);
 
