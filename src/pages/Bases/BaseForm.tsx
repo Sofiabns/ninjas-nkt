@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,13 +14,26 @@ import { generateId } from "@/utils/idGenerator";
 import { Attachment } from "@/types";
 
 export default function BaseForm() {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { data, addBase } = useApp();
+  const { data, addBase, updateBase } = useApp();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [gangId, setGangId] = useState<string>("none");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+
+  useEffect(() => {
+    if (id) {
+      const base = data.bases.find((b) => b.id === id);
+      if (base) {
+        setName(base.name);
+        setDescription(base.description);
+        setGangId(base.gangId || "none");
+        setAttachments(base.attachments || []);
+      }
+    }
+  }, [id, data.bases]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +47,7 @@ export default function BaseForm() {
     // 🚀 Upload de arquivos para o Supabase
     for (const att of attachments) {
       if (att.file) {
-        const url = await uploadFile(att.file, { baseId: undefined });
+        const url = await uploadFile(att.file, { baseId: id });
         uploadedAttachments.push({
           id: generateId("ATT", uploadedAttachments.map(a => a.id)),
           name: att.file.name,
@@ -46,18 +59,20 @@ export default function BaseForm() {
       }
     }
 
-    // images vazias porque agora usamos attachments
-    const images: string[] = [];
-
-    await addBase({ name, description, gangId, attachments: uploadedAttachments, metadata: {} });
-    toast.success("Base criada");
+    if (id) {
+      await updateBase(id, { name, description, gangId, attachments: uploadedAttachments, metadata: {} });
+      toast.success("Base atualizada");
+    } else {
+      await addBase({ name, description, gangId, attachments: uploadedAttachments, metadata: {} });
+      toast.success("Base criada");
+    }
     navigate("/bases");
   };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-4xl font-bold text-primary text-glow">NOVA BASE</h1>
+        <h1 className="text-4xl font-bold text-primary text-glow">{id ? "EDITAR BASE" : "NOVA BASE"}</h1>
       </motion.div>
 
       <Card className="p-6 bg-card border-border">
@@ -89,14 +104,14 @@ export default function BaseForm() {
               <SelectTrigger className="bg-input border-border">
                 <SelectValue placeholder="Selecione uma facção (opcional)" />
               </SelectTrigger>
-            <SelectContent className="bg-popover border-border z-50">
-              <SelectItem value="none">Nenhuma</SelectItem>
-              {data.gangs.map((gang) => (
-                <SelectItem key={gang.id} value={gang.id}>
-                  {gang.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
+              <SelectContent className="bg-popover border-border z-50">
+                <SelectItem value="none">Nenhuma</SelectItem>
+                {data.gangs.map((gang) => (
+                  <SelectItem key={gang.id} value={gang.id}>
+                    {gang.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
 
@@ -110,7 +125,7 @@ export default function BaseForm() {
               Cancelar
             </Button>
             <Button type="submit" className="flex-1 bg-primary text-primary-foreground box-glow">
-              Criar Base
+              {id ? "Atualizar Base" : "Criar Base"}
             </Button>
           </div>
         </form>
