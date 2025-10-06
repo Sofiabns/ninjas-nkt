@@ -953,19 +953,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const addAuction = async (auction: Omit<Auction, "id" | "createdAt">) => {
     const id = generateId("A", data.auctions.map((a) => a.id));
     const newAuction: Auction = { ...auction, id, createdAt: new Date().toISOString() };
-    
+
     const { error } = await supabase.from('auctions').insert({
       id: newAuction.id,
       title: newAuction.title,
+      description: newAuction.description,
       entries: newAuction.entries,
+      attachments: newAuction.attachments,
       created_at: newAuction.createdAt
     });
-    
+
     if (error) {
       toast.error('Erro ao criar leilão');
       return;
     }
-    
+
     setData((prev) => ({ ...prev, auctions: [...prev.auctions, newAuction] }));
     addActivityLog("Criou leilão", "Auction", id);
   };
@@ -973,16 +975,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateAuction = async (id: string, auction: Partial<Auction>) => {
     const updateData: any = {};
     if (auction.title) updateData.title = auction.title;
+    if (auction.description !== undefined) updateData.description = auction.description;
     if (auction.entries) updateData.entries = auction.entries;
     if (auction.attachments) updateData.attachments = auction.attachments;
-    
+
     const { error } = await supabase.from('auctions').update(updateData).eq('id', id);
-    
+
     if (error) {
       toast.error('Erro ao atualizar leilão');
       return;
     }
-    
+
     setData((prev) => ({
       ...prev,
       auctions: prev.auctions.map((a) => (a.id === id ? { ...a, ...auction } : a)),
