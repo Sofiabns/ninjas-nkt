@@ -25,7 +25,8 @@ export default function PersonForm() {
   const [phone, setPhone] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
-  const [deepIds, setDeepIds] = useState<string[]>([]);
+  const [deeps, setDeeps] = useState<string[]>([]);
+  const [deepInput, setDeepInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function PersonForm() {
         setPhone(person.phone);
         setAttachments(person.attachments);
         setVehicleIds(person.vehicleIds);
-        setDeepIds(person.deepIds || []);
+        setDeeps(person.deeps || []);
       }
     }
   }, [id]);
@@ -77,10 +78,10 @@ export default function PersonForm() {
     }
 
     if (id) {
-      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds, deepIds });
+      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds, deeps });
       toast.success("Pessoa atualizada");
     } else {
-      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds, deepIds });
+      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds, deeps });
       toast.success("Pessoa registrada");
     }
     navigate("/people");
@@ -196,42 +197,49 @@ export default function PersonForm() {
 
           <div>
             <label className="text-sm font-mono text-foreground mb-2 block">DEEPS (Opcional)</label>
-            <Select
-              value={deepIds[0] || ""}
-              onValueChange={(val) => {
-                if (val && !deepIds.includes(val)) {
-                  setDeepIds([...deepIds, val]);
-                }
-              }}
-            >
-              <SelectTrigger className="bg-input border-border">
-                <SelectValue placeholder="Selecione um deep" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover border-border z-50">
-                {data.deeps.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
-                    {d.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {deepIds.length > 0 && (
+            <div className="flex gap-2">
+              <Input
+                value={deepInput}
+                onChange={(e) => setDeepInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && deepInput.trim()) {
+                    e.preventDefault();
+                    if (!deeps.includes(deepInput.trim())) {
+                      setDeeps([...deeps, deepInput.trim()]);
+                      setDeepInput("");
+                    }
+                  }
+                }}
+                placeholder="Digite o nome da deep e pressione Enter"
+                className="bg-input border-border flex-1"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  if (deepInput.trim() && !deeps.includes(deepInput.trim())) {
+                    setDeeps([...deeps, deepInput.trim()]);
+                    setDeepInput("");
+                  }
+                }}
+              >
+                Adicionar
+              </Button>
+            </div>
+            {deeps.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
-                {deepIds.map((deepId) => {
-                  const deep = data.deeps.find((d) => d.id === deepId);
-                  return (
-                    <div key={deepId} className="bg-secondary px-3 py-1 rounded text-sm flex items-center gap-2">
-                      {deep?.title}
-                      <button
-                        type="button"
-                        onClick={() => setDeepIds(deepIds.filter((id) => id !== deepId))}
-                        className="text-destructive hover:text-destructive/80"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  );
-                })}
+                {deeps.map((deep, index) => (
+                  <div key={index} className="bg-secondary px-3 py-1 rounded text-sm flex items-center gap-2">
+                    {deep}
+                    <button
+                      type="button"
+                      onClick={() => setDeeps(deeps.filter((d) => d !== deep))}
+                      className="text-destructive hover:text-destructive/80 font-bold"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </div>

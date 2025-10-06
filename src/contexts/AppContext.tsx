@@ -162,7 +162,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               phone: p.phone,
               attachments: p.attachments || [],
               vehicleIds: p.vehicle_ids || [],
-              deepIds: p.deep_ids || [],
+              deeps: p.deeps || [],
               createdAt: p.created_at
             })) || [],
             vehicles: vehiclesRes.data?.map(v => ({
@@ -394,10 +394,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       full_name: newPerson.fullName,
       gang: newPerson.gang,
       hierarchy: newPerson.hierarchy,
-        phone: newPerson.phone,
-        attachments: newPerson.attachments,
-        vehicle_ids: newPerson.vehicleIds,
-        deep_ids: newPerson.deepIds || [],
+      phone: newPerson.phone,
+      attachments: newPerson.attachments,
+      vehicle_ids: newPerson.vehicleIds,
+      deeps: newPerson.deeps || [],
       created_at: newPerson.createdAt
     });
     
@@ -418,7 +418,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (person.phone) updateData.phone = person.phone;
     if (person.attachments !== undefined) updateData.attachments = person.attachments;
     if (person.vehicleIds) updateData.vehicle_ids = person.vehicleIds;
-    if (person.deepIds !== undefined) updateData.deep_ids = person.deepIds;
+    if (person.deeps !== undefined) updateData.deeps = person.deeps;
 
     const { error } = await supabase.from('people').update(updateData).eq('id', id);
 

@@ -179,7 +179,6 @@ export default function GlobalSearch() {
           {foundPeople.map((person) => {
             const gang = data.gangs.find((g) => g.name === person.gang);
             const vehicles = data.vehicles.filter((v) => person.vehicleIds.includes(v.id));
-            const deeps = person.deepIds?.map(deepId => data.deeps.find(d => d.id === deepId)).filter(Boolean) || [];
             
             return (
               <motion.div
@@ -225,12 +224,12 @@ export default function GlobalSearch() {
                             ))}
                           </div>
                         )}
-                        {deeps.length > 0 && (
+                        {person.deeps && person.deeps.length > 0 && (
                           <div className="flex items-center gap-2 flex-wrap mt-2">
                             <span className="text-xs text-muted-foreground">Deeps:</span>
-                            {deeps.map((d) => (
-                              <Badge key={d?.id} variant="secondary" className="text-xs">
-                                {d?.title}
+                            {person.deeps.map((deep, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">
+                                {deep}
                               </Badge>
                             ))}
                           </div>

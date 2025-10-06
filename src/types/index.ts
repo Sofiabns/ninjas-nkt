@@ -12,7 +12,7 @@ export interface Person {
   phone: string;
   attachments: Attachment[];
   vehicleIds: string[];
-  deepIds: string[];
+  deeps: string[];
   createdAt: string;
 }
 
