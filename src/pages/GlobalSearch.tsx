@@ -215,22 +215,17 @@ export default function GlobalSearch() {
                         <p className="text-sm">
                           <span className="text-muted-foreground">Hierarquia:</span> {person.hierarchy}
                         </p>
+                        {person.deep && (
+                          <p className="text-sm">
+                            <span className="text-muted-foreground">Deep:</span> {person.deep}
+                          </p>
+                        )}
                         {vehicles.length > 0 && (
                           <div className="flex items-center gap-2 flex-wrap mt-2">
                             <span className="text-xs text-muted-foreground">Veículos:</span>
                             {vehicles.map((v) => (
                               <Badge key={v.id} variant="outline" className="text-xs">
                                 {v.plate} - {v.model}
-                              </Badge>
-                            ))}
-                          </div>
-                        )}
-                        {person.deeps && person.deeps.length > 0 && (
-                          <div className="flex items-center gap-2 flex-wrap mt-2">
-                            <span className="text-xs text-muted-foreground">Deeps:</span>
-                            {person.deeps.map((deep, idx) => (
-                              <Badge key={idx} variant="secondary" className="text-xs">
-                                {deep}
                               </Badge>
                             ))}
                           </div>
