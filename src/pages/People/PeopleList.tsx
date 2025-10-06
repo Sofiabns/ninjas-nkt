@@ -26,6 +26,8 @@ export default function PeopleList() {
     filtered = filtered.filter((p) => p.gang === gangFilter);
   }
 
+  filtered = filtered.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+
   const handleDelete = (id: string) => {
     if (confirm("Tem certeza que deseja deletar esta pessoa?")) {
       deletePerson(id);
