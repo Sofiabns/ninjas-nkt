@@ -274,7 +274,7 @@ export default function GlobalSearch() {
                         <span className="text-muted-foreground">Modelo:</span> {vehicle.model}
                       </p>
                       {owner && (
-                        <>
+                        <div className="mt-2 space-y-1">
                           <p className="text-sm">
                             <span className="text-muted-foreground">Proprietário:</span>{" "}
                             <span
@@ -293,7 +293,7 @@ export default function GlobalSearch() {
                               {owner.gang}
                             </span>
                           </p>
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>
