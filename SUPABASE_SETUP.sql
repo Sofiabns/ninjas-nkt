@@ -66,6 +66,7 @@ CREATE TABLE IF NOT EXISTS investigations (
   title TEXT NOT NULL,
   sections JSONB DEFAULT '[]',
   person_ids TEXT[] DEFAULT '{}',
+  gang_id TEXT,
   attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
