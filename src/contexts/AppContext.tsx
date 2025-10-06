@@ -200,6 +200,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               title: i.title,
               sections: i.sections || [],
               personIds: i.person_ids || [],
+              factionIds: i.faction_ids || [],
               attachments: i.attachments || [],
               createdAt: i.created_at
             })) || [],
@@ -662,6 +663,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       title: newInvestigation.title,
       sections: newInvestigation.sections,
       person_ids: newInvestigation.personIds,
+      faction_ids: newInvestigation.factionIds,
       attachments: newInvestigation.attachments,
       created_at: newInvestigation.createdAt
     });
@@ -680,6 +682,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (investigation.title) updateData.title = investigation.title;
     if (investigation.sections) updateData.sections = investigation.sections;
     if (investigation.personIds) updateData.person_ids = investigation.personIds;
+    if (investigation.factionIds) updateData.faction_ids = investigation.factionIds;
     if (investigation.attachments) updateData.attachments = investigation.attachments;
     
     const { error } = await supabase.from('investigations').update(updateData).eq('id', id);
