@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS people (
   hierarchy TEXT NOT NULL CHECK (hierarchy IN ('Lider', 'Sub-Lider', 'Membro')),
   phone TEXT NOT NULL,
   attachments JSONB DEFAULT '[]',
+  deep TEXT,
   vehicle_ids TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
