@@ -4,12 +4,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useApp } from "@/contexts/AppContext";
-import { ArrowLeft, User, FileText, Paperclip } from "lucide-react";
+import { ArrowLeft, User, FileText, Paperclip, Users } from "lucide-react";
 
 export default function InvestigationDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getInvestigation, getPerson } = useApp();
+  const { getInvestigation, getPerson, getGang } = useApp();
 
   const investigation = id ? getInvestigation(id) : null;
 
@@ -87,6 +87,34 @@ export default function InvestigationDetails() {
                   <div>
                     <p className="font-mono text-foreground">{person.fullName}</p>
                     <p className="text-xs text-muted-foreground">{person.id}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
+      {/* Facções Envolvidas */}
+      {investigation.factionIds && investigation.factionIds.length > 0 && (
+        <Card className="p-6 bg-card border-border">
+          <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            FACÇÕES ENVOLVIDAS
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {investigation.factionIds.map((factionId) => {
+              const faction = getGang(factionId);
+              if (!faction) return null;
+              return (
+                <div
+                  key={factionId}
+                  className="flex items-center gap-3 p-3 bg-secondary rounded border border-border cursor-pointer hover:border-primary transition-colors"
+                  onClick={() => navigate(`/gangs/${factionId}`)}
+                >
+                  <div>
+                    <p className="font-mono text-foreground">{faction.name}</p>
+                    <p className="text-xs text-muted-foreground">{faction.id}</p>
                   </div>
                 </div>
               );
