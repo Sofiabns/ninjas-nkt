@@ -11,7 +11,18 @@ export async function uploadFile(file: File, options: {
   deepId?: string;
   baseId?: string;
 }) {
-  const filePath = `uploads/${Date.now()}_${file.name}`;
+  // Determinar a pasta com base na entidade
+  let folder = 'outros';
+  if (options.investigationId) folder = 'investigations';
+  else if (options.caseId) folder = 'cases';
+  else if (options.personId) folder = 'people';
+  else if (options.meetingId) folder = 'meetings';
+  else if (options.auctionId) folder = 'auctions';
+  else if (options.vehicleId) folder = 'vehicles';
+  else if (options.deepId) folder = 'deeps';
+  else if (options.baseId) folder = 'bases';
+
+  const filePath = `${folder}/${Date.now()}_${file.name}`;
 
   // 1. Enviar arquivo para o bucket
   const { error: uploadError } = await supabase.storage
