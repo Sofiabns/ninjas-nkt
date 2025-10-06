@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -44,7 +45,16 @@ const queryClient = new QueryClient();
 import PasswordScreen from "./pages/PasswordScreen";
 
 function App() {
-  const accessGranted = sessionStorage.getItem("accessGranted") === "true";
+  const [accessGranted, setAccessGranted] = useState(sessionStorage.getItem("accessGranted") === "true");
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setAccessGranted(sessionStorage.getItem("accessGranted") === "true");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
