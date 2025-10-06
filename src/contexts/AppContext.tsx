@@ -976,8 +976,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const updateData: any = {};
     if (auction.title !== undefined) updateData.title = auction.title;
     if (auction.description !== undefined) updateData.description = auction.description;
-    if (auction.entries !== undefined) updateData.entries = auction.entries;
-    if (auction.attachments !== undefined) updateData.attachments = auction.attachments;
+    if (auction.entries !== undefined) updateData.entries = Array.isArray(auction.entries) ? auction.entries : [];
+    if (auction.attachments !== undefined) updateData.attachments = Array.isArray(auction.attachments) ? auction.attachments : [];
 
     // Only update if there are fields to update
     if (Object.keys(updateData).length === 0) {
@@ -985,9 +985,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return;
     }
 
+    console.log('Updating auction', id, 'with data:', updateData);
+
     const { error } = await supabase.from('auctions').update(updateData).eq('id', id);
 
     if (error) {
+      console.error('Supabase update error:', error);
       toast.error('Erro ao atualizar leilão');
       return;
     }
