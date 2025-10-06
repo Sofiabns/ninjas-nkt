@@ -244,6 +244,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             auctions: auctionsRes.data?.map(a => ({
               id: a.id,
               title: a.title,
+              description: a.description,
               entries: a.entries || [],
               attachments: a.attachments || [],
               createdAt: a.created_at

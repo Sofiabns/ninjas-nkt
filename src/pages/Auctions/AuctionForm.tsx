@@ -19,6 +19,7 @@ export default function AuctionForm() {
   const { data, addAuction, updateAuction } = useApp();
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [entries, setEntries] = useState<AuctionEntry[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
@@ -31,6 +32,7 @@ export default function AuctionForm() {
       const auction = data.auctions.find((a) => a.id === id);
       if (auction) {
         setTitle(auction.title);
+        setDescription(auction.description || "");
         setEntries(auction.entries);
         setAttachments(auction.attachments || []);
       }
@@ -84,10 +86,10 @@ export default function AuctionForm() {
     }
 
     if (id) {
-      await updateAuction(id, { title, entries, attachments: uploadedAttachments });
+      await updateAuction(id, { title, description, entries, attachments: uploadedAttachments });
       toast.success("Leilão atualizado");
     } else {
-      await addAuction({ title, entries, attachments: uploadedAttachments });
+      await addAuction({ title, description, entries, attachments: uploadedAttachments });
       toast.success("Leilão criado");
     }
     navigate("/auctions");
@@ -116,6 +118,17 @@ export default function AuctionForm() {
               placeholder="Ex: Leilão Mensal Janeiro"
               className="bg-input border-border"
               required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">DESCRIÇÃO (opcional)</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descrição do leilão"
+              className="w-full p-2 border border-border rounded bg-input text-foreground resize-none"
+              rows={3}
             />
           </div>
 

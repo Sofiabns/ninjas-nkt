@@ -53,6 +53,9 @@ export default function AuctionDetails() {
                 {auction.title}
               </h1>
             </div>
+            {auction.description && (
+              <p className="text-muted-foreground mb-2 whitespace-pre-wrap">{auction.description}</p>
+            )}
             <p className="text-muted-foreground font-mono text-sm">
               Criado em {new Date(auction.createdAt).toLocaleString()}
             </p>

@@ -127,6 +127,7 @@ export interface AuctionEntry {
 export interface Auction {
   id: string;
   title: string;
+  description?: string;
   entries: AuctionEntry[];
   attachments: Attachment[];
   createdAt: string;

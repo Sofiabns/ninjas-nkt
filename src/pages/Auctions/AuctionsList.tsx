@@ -71,6 +71,9 @@ export default function AuctionsList() {
                       <span className="text-accent font-mono text-sm">{auction.id}</span>
                       <h3 className="text-lg font-bold text-foreground">{auction.title}</h3>
                     </div>
+                    {auction.description && (
+                      <p className="text-sm text-muted-foreground mb-2 line-clamp-2">{auction.description}</p>
+                    )}
                     <div className="flex gap-4 text-xs text-muted-foreground mb-2">
                       <span>Entradas: {auction.entries.length}</span>
                       <span>Criado: {new Date(auction.createdAt).toLocaleDateString()}</span>
