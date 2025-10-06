@@ -30,7 +30,8 @@ export default function PasswordScreen() {
     if (password === CORRECT_PASSWORD) {
       // Store access granted in session storage
       sessionStorage.setItem("accessGranted", "true");
-      navigate("/");
+      // Force page reload to update the app state
+      window.location.href = "/";
     } else {
       alert("Senha incorreta. Tente novamente.");
       setPassword("");
