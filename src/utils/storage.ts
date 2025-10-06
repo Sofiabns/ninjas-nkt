@@ -11,6 +11,7 @@ const defaultInvestigators: Investigator[] = [
   { id: "N-05", name: "Lua", attachments: [] },
   { id: "N-06", name: "Hiro", attachments: [] },
   { id: "N-07", name: "Lara", attachments: [] },
+  { id: "N-08", name: "Francisco", attachments: [] },
 ];
 
 export const getDefaultData = (): AppData => ({
