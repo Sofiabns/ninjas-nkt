@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/contexts/AppContext";
-import { ArrowLeft, Download, FileText, ExternalLink } from "lucide-react";
+import { ArrowLeft, Download, FileText, ExternalLink, Paperclip } from "lucide-react";
 
 export default function BaseDetails() {
   const { id } = useParams();
@@ -52,16 +52,6 @@ export default function BaseDetails() {
             <p className="text-muted-foreground font-mono text-sm">
               Criado em {new Date(base.createdAt).toLocaleString()}
             </p>
-
-            {base.attachments && base.attachments.length > 0 && base.attachments[0].type.startsWith("image/") && (
-              <div className="aspect-video bg-secondary rounded mt-4 overflow-hidden">
-                <img
-                  src={base.attachments[0].url}
-                  alt={base.attachments[0].name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
           </div>
 
           <Button
@@ -92,45 +82,65 @@ export default function BaseDetails() {
 
       {base.attachments && base.attachments.length > 0 && (
         <Card className="p-6 bg-card border-border">
-          <h2 className="text-xl font-bold text-primary mb-4">ANEXOS ({base.attachments.length})</h2>
-          <div className="space-y-2">
-            {base.attachments.map((attachment) => (
-              <div
-                key={attachment.id}
-                className="flex items-center justify-between p-3 bg-secondary rounded border border-border"
-              >
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-mono text-foreground">{attachment.name}</p>
-                    <p className="text-xs text-muted-foreground">{attachment.type}</p>
+          <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+            <Paperclip className="h-5 w-5" />
+            ANEXOS ({base.attachments.length})
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {base.attachments.map((attachment, index) => {
+              const isImage = attachment.type.startsWith("image/");
+              return (
+                <div
+                  key={index}
+                  className="bg-secondary rounded border border-border overflow-hidden group"
+                >
+                  <div className="relative">
+                    {isImage ? (
+                      <img
+                        src={attachment.url}
+                        alt={attachment.name}
+                        className="w-full h-48 object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => window.open(attachment.url, '_blank')}
+                      />
+                    ) : (
+                      <div className="w-full h-48 flex items-center justify-center text-6xl text-muted-foreground bg-card">
+                        📄
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <a
+                        href={attachment.url}
+                        download={attachment.name}
+                        className="p-2 bg-black/60 rounded hover:bg-black/80"
+                        title="Baixar"
+                      >
+                        <Paperclip className="h-4 w-4 text-white" />
+                      </a>
+                      <a
+                        href={attachment.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 bg-black/60 rounded hover:bg-black/80"
+                        title="Abrir"
+                      >
+                        <span className="text-white text-xs">Abrir</span>
+                      </a>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-xs text-foreground truncate font-mono">{attachment.name}</p>
+                    {isImage && (
+                      <button
+                        onClick={() => window.open(attachment.url, '_blank')}
+                        className="text-xs text-accent hover:text-primary mt-1"
+                      >
+                        Ver imagem completa
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => window.open(attachment.url, '_blank')}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = attachment.url;
-                      link.download = attachment.name;
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                    }}
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       )}

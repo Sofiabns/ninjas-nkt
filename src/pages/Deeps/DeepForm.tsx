@@ -69,10 +69,10 @@ export default function DeepForm() {
     const finalGangId = gangId === "none" ? undefined : gangId;
 
     if (id) {
-      await updateDeep(id, { title, description, personIds, gangId: finalGangId, images, attachments: uploadedAttachments });
+      await updateDeep(id, { title, description, personIds, gangId: finalGangId, attachments: uploadedAttachments });
       toast.success("Deep atualizado");
     } else {
-      await addDeep({ title, description, personIds, gangId: finalGangId, images, attachments: uploadedAttachments });
+      await addDeep({ title, description, personIds, gangId: finalGangId, attachments: uploadedAttachments });
       toast.success("Deep criado");
     }
     navigate("/deeps");
