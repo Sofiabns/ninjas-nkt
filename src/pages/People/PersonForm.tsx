@@ -23,6 +23,7 @@ export default function PersonForm() {
   const [gang, setGang] = useState("");
   const [hierarchy, setHierarchy] = useState<"Lider" | "Sub-Lider" | "Membro">("Membro");
   const [phone, setPhone] = useState("");
+  const [deep, setDeep] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [vehicleIds, setVehicleIds] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -35,6 +36,7 @@ export default function PersonForm() {
         setGang(person.gang);
         setHierarchy(person.hierarchy);
         setPhone(person.phone);
+        setDeep(person.deep || "");
         setAttachments(person.attachments);
         setVehicleIds(person.vehicleIds);
       }
@@ -75,10 +77,10 @@ export default function PersonForm() {
     }
 
     if (id) {
-      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds });
+      updatePerson(id, { fullName, gang, hierarchy, phone, attachments, vehicleIds, deep });
       toast.success("Pessoa atualizada");
     } else {
-      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds });
+      addPerson({ fullName, gang, hierarchy, phone, attachments, vehicleIds, deep });
       toast.success("Pessoa registrada");
     }
     navigate("/people");
@@ -159,6 +161,15 @@ export default function PersonForm() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div>
+            <label className="text-sm font-mono text-foreground mb-2 block">DEEP</label>
+            <Input
+              value={deep}
+              onChange={(e) => setDeep(e.target.value)}
+              placeholder="Deep opcional"
+              className="bg-input border-border"
+            />
           </div>
 
           <div>

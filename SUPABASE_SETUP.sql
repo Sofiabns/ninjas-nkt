@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS people (
   phone TEXT NOT NULL,
   attachments JSONB DEFAULT '[]',
   vehicle_ids TEXT[] DEFAULT '{}',
+  deep TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -190,6 +191,8 @@ ALTER TABLE uploads ADD COLUMN IF NOT EXISTS auction_id TEXT;
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS vehicle_id TEXT;
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS deep_id TEXT;
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS base_id TEXT;
+
+ALTER TABLE people ADD COLUMN IF NOT EXISTS deep TEXT;
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES
