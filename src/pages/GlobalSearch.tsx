@@ -274,18 +274,26 @@ export default function GlobalSearch() {
                         <span className="text-muted-foreground">Modelo:</span> {vehicle.model}
                       </p>
                       {owner && (
-                        <p className="text-sm">
-                          <span className="text-muted-foreground">Proprietário:</span>{" "}
-                          <span
-                            className="text-accent cursor-pointer hover:underline"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/people/${owner.id}`);
-                            }}
-                          >
-                            {owner.fullName}
-                          </span>
-                        </p>
+                        <>
+                          <p className="text-sm">
+                            <span className="text-muted-foreground">Proprietário:</span>{" "}
+                            <span
+                              className="text-accent cursor-pointer hover:underline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/people/${owner.id}`);
+                              }}
+                            >
+                              {owner.fullName}
+                            </span>
+                          </p>
+                          <p className="text-sm">
+                            <span className="text-muted-foreground">Facção:</span>{" "}
+                            <span style={{ color: data.gangs.find(g => g.name === owner.gang)?.color || "inherit" }}>
+                              {owner.gang}
+                            </span>
+                          </p>
+                        </>
                       )}
                     </div>
                   </div>
