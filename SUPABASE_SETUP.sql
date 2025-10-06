@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS investigations (
   title TEXT NOT NULL,
   sections JSONB DEFAULT '[]',
   person_ids TEXT[] DEFAULT '{}',
-  gang_id TEXT,
+  faction_ids TEXT[] DEFAULT '{}',
   attachments JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -194,6 +194,8 @@ ALTER TABLE uploads ADD COLUMN IF NOT EXISTS auction_id TEXT;
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS vehicle_id TEXT;
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS deep_id TEXT;
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS base_id TEXT;
+ALTER TABLE investigations ADD COLUMN IF NOT EXISTS faction_ids TEXT[] DEFAULT '{}';
+
 
 ALTER TABLE people ADD COLUMN IF NOT EXISTS deep TEXT;
 
