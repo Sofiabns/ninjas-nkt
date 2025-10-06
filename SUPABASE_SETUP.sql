@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS auctions (
   title TEXT NOT NULL,
   entries JSONB DEFAULT '[]',
   attachments JSONB DEFAULT '[]',
-  description TEXT
+  description TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
