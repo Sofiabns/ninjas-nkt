@@ -43,12 +43,27 @@ export default function GlobalSearch() {
 
   // Search gangs
   const foundGangs = searchTerm
-    ? data.gangs.filter(
-        (g) =>
-          g.name.toLowerCase().includes(searchTerm) ||
-          g.description.toLowerCase().includes(searchTerm) ||
-          g.id.toLowerCase().includes(searchTerm)
-      )
+    ? (() => {
+        const matchingGangs = data.gangs.filter(
+          (g) =>
+            g.name.toLowerCase().includes(searchTerm) ||
+            g.description.toLowerCase().includes(searchTerm) ||
+            g.id.toLowerCase().includes(searchTerm)
+        );
+
+        const alliedGangIds = new Set<string>();
+
+        // Add the matching gangs themselves
+        matchingGangs.forEach(gang => alliedGangIds.add(gang.id));
+
+        // Add their allied gangs
+        matchingGangs.forEach(gang => {
+          gang.alliedGangIds?.forEach(alliedId => alliedGangIds.add(alliedId));
+        });
+
+        // Return all gangs that are either matching or allied
+        return data.gangs.filter(gang => alliedGangIds.has(gang.id));
+      })()
     : [];
 
   // Search cases
