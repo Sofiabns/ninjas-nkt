@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const CORRECT_PASSWORD = "ninjasmelhordepartamentoever"; // You can change this password
+const CORRECT_PASSWORD = "senhasecretanaovazapfninjasmelhores"; // You can change this password
 
 export default function PasswordScreen() {
   const navigate = useNavigate();
