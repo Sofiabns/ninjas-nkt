@@ -31,7 +31,15 @@ export default function AuctionDetails() {
     return acc;
   }, {} as Record<string, number>);
 
+  const totalGearsByGang = auction.entries.reduce((acc, entry) => {
+    if (entry.gears) {
+      acc[entry.gangId] = (acc[entry.gangId] || 0) + entry.gears;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
   const grandTotal = auction.entries.reduce((sum, entry) => sum + entry.amount, 0);
+  const grandTotalGears = auction.entries.reduce((sum, entry) => sum + (entry.gears || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -86,9 +94,16 @@ export default function AuctionDetails() {
                   </p>
                   <p className="text-xs text-muted-foreground">{entry.item}</p>
                 </div>
-                <p className="text-lg font-bold text-primary">
-                  ${entry.amount.toLocaleString()}
-                </p>
+                <div className="flex gap-3 items-center">
+                  <p className="text-lg font-bold text-primary">
+                    ${entry.amount.toLocaleString()}
+                  </p>
+                  {entry.gears && (
+                    <p className="text-lg font-bold text-accent">
+                      ⚙️ {entry.gears}
+                    </p>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -100,23 +115,38 @@ export default function AuctionDetails() {
         <div className="space-y-3">
           {Object.entries(totalByGang).map(([gangId, total]) => {
             const gang = data.gangs.find((g) => g.id === gangId);
+            const gears = totalGearsByGang[gangId];
             return (
               <div
                 key={gangId}
                 className="flex justify-between items-center p-3 bg-card rounded border border-border"
               >
                 <span className="text-base font-mono text-foreground">{gang?.name}</span>
-                <span className="text-xl font-bold text-primary">
-                  ${total.toLocaleString()}
-                </span>
+                <div className="flex gap-3 items-center">
+                  <span className="text-xl font-bold text-primary">
+                    ${total.toLocaleString()}
+                  </span>
+                  {gears && (
+                    <span className="text-xl font-bold text-accent">
+                      ⚙️ {gears}
+                    </span>
+                  )}
+                </div>
               </div>
             );
           })}
           <div className="pt-3 border-t border-border flex justify-between items-center">
             <span className="text-lg font-bold text-foreground">TOTAL GERAL</span>
-            <span className="text-2xl font-bold text-primary">
-              ${grandTotal.toLocaleString()}
-            </span>
+            <div className="flex gap-3 items-center">
+              <span className="text-2xl font-bold text-primary">
+                ${grandTotal.toLocaleString()}
+              </span>
+              {grandTotalGears > 0 && (
+                <span className="text-2xl font-bold text-accent">
+                  ⚙️ {grandTotalGears}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </Card>

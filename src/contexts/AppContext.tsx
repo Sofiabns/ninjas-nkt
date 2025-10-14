@@ -182,6 +182,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               description: g.description,
               color: g.color,
               alliedGangIds: g.allied_gang_ids || [],
+              friendGangIds: g.friend_gang_ids || [],
               createdAt: g.created_at
             })) || [],
             cases: casesRes.data?.map(c => ({
@@ -523,6 +524,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       description: newGang.description,
       color: newGang.color,
       allied_gang_ids: newGang.alliedGangIds || [],
+      friend_gang_ids: newGang.friendGangIds || [],
       created_at: newGang.createdAt
     });
     
@@ -541,6 +543,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (gang.description) updateData.description = gang.description;
     if (gang.color !== undefined) updateData.color = gang.color;
     if (gang.alliedGangIds) updateData.allied_gang_ids = gang.alliedGangIds;
+    if (gang.friendGangIds !== undefined) updateData.friend_gang_ids = gang.friendGangIds;
     
     const { error } = await supabase.from('gangs').update(updateData).eq('id', id);
     

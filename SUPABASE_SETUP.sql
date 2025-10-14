@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS gangs (
   description TEXT NOT NULL,
   color TEXT,
   allied_gang_ids TEXT[] DEFAULT '{}',
+  friend_gang_ids TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -199,6 +200,7 @@ ALTER TABLE investigations ADD COLUMN IF NOT EXISTS faction_ids TEXT[] DEFAULT '
 
 ALTER TABLE people ADD COLUMN IF NOT EXISTS deep TEXT;
 ALTER TABLE auctions ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
+ALTER TABLE gangs ADD COLUMN IF NOT EXISTS friend_gang_ids TEXT[] DEFAULT '{}';
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES

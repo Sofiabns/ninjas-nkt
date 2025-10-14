@@ -169,6 +169,35 @@ export default function GangsList() {
                     </div>
                   </div>
                 )}
+
+                {gang.friendGangIds && gang.friendGangIds.length > 0 && (
+                  <div className="border-t border-border pt-4 mt-4">
+                    <h4 className="text-sm font-mono text-accent mb-3">
+                      AMIZADES ({gang.friendGangIds.length})
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {gang.friendGangIds.map((friendId) => {
+                        const friendGang = data.gangs.find(g => g.id === friendId);
+                        if (!friendGang) return null;
+                        return (
+                          <div
+                            key={friendId}
+                            className="flex items-center gap-2 px-3 py-1 bg-secondary rounded border border-border hover:border-primary transition-colors cursor-pointer"
+                            onClick={() => navigate(`/gangs/${friendId}`)}
+                          >
+                            {friendGang.color && (
+                              <div
+                                className="w-4 h-4 rounded-full border border-border"
+                                style={{ backgroundColor: friendGang.color }}
+                              />
+                            )}
+                            <span className="text-sm text-foreground font-mono">{friendGang.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </Card>
             </motion.div>
           );

@@ -57,6 +57,13 @@ export default function AuctionsList() {
             return acc;
           }, {} as Record<string, number>);
 
+          const totalGearsByGang = auction.entries.reduce((acc, entry) => {
+            if (entry.gears) {
+              acc[entry.gangId] = (acc[entry.gangId] || 0) + entry.gears;
+            }
+            return acc;
+          }, {} as Record<string, number>);
+
           return (
             <motion.div
               key={auction.id}
@@ -81,10 +88,14 @@ export default function AuctionsList() {
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(totalByGang).map(([gangId, total]) => {
                         const gang = data.gangs.find((g) => g.id === gangId);
+                        const gears = totalGearsByGang[gangId];
                         return gang ? (
-                          <div key={gangId} className="text-xs bg-secondary px-2 py-1 rounded">
+                          <div key={gangId} className="text-xs bg-secondary px-2 py-1 rounded flex gap-2 items-center">
                             <span className="text-foreground font-mono">{gang.name}:</span>{" "}
                             <span className="text-primary font-bold">${total.toLocaleString()}</span>
+                            {gears && (
+                              <span className="text-accent font-bold">⚙️ {gears}</span>
+                            )}
                           </div>
                         ) : null;
                       })}

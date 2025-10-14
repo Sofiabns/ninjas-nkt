@@ -97,6 +97,36 @@ export default function GangDetails() {
         </Card>
       )}
 
+      {gang.friendGangIds && gang.friendGangIds.length > 0 && (
+        <Card className="p-6 bg-card border-border">
+          <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+            <Users className="h-5 w-5" /> AMIZADES ({gang.friendGangIds.length})
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            {gang.friendGangIds.map((friendId) => {
+              const friend = data.gangs.find((g) => g.id === friendId);
+              if (!friend) return null;
+              return (
+                <button
+                  key={friendId}
+                  onClick={() => navigate(`/gangs/${friendId}`)}
+                  className="flex items-center gap-2 px-3 py-1 bg-secondary rounded border border-border hover:border-primary transition-colors"
+                  title={friend.name}
+                >
+                  {friend.color && (
+                    <span
+                      className="w-3 h-3 rounded-full border border-border"
+                      style={{ backgroundColor: friend.color }}
+                    />
+                  )}
+                  <span className="text-sm text-foreground font-mono">{friend.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
       <Card className="p-6 bg-card border-border">
         <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
           <Users className="h-5 w-5" /> MEMBROS ({members.length})

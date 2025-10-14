@@ -26,6 +26,7 @@ export default function AuctionForm() {
   const [currentGangId, setCurrentGangId] = useState("");
   const [currentItem, setCurrentItem] = useState("");
   const [currentAmount, setCurrentAmount] = useState("");
+  const [currentGears, setCurrentGears] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -51,10 +52,17 @@ export default function AuctionForm() {
       return;
     }
 
-    setEntries([...entries, { gangId: currentGangId, item: currentItem, amount }]);
+    const gears = currentGears ? parseFloat(currentGears) : undefined;
+    if (currentGears && (isNaN(gears!) || gears! < 0)) {
+      toast.error("Número de engrenagens inválido");
+      return;
+    }
+
+    setEntries([...entries, { gangId: currentGangId, item: currentItem, amount, gears }]);
     setCurrentGangId("");
     setCurrentItem("");
     setCurrentAmount("");
+    setCurrentGears("");
   };
 
   const handleRemoveEntry = (index: number) => {
@@ -97,6 +105,13 @@ export default function AuctionForm() {
 
   const totalByGang = entries.reduce((acc, entry) => {
     acc[entry.gangId] = (acc[entry.gangId] || 0) + entry.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const totalGearsByGang = entries.reduce((acc, entry) => {
+    if (entry.gears) {
+      acc[entry.gangId] = (acc[entry.gangId] || 0) + entry.gears;
+    }
     return acc;
   }, {} as Record<string, number>);
 
@@ -166,6 +181,16 @@ export default function AuctionForm() {
                 min="0"
               />
 
+              <Input
+                type="number"
+                value={currentGears}
+                onChange={(e) => setCurrentGears(e.target.value)}
+                placeholder="Engrenagens (opcional)"
+                className="bg-input border-border"
+                step="1"
+                min="0"
+              />
+
               <Button
                 type="button"
                 variant="outline"
@@ -196,9 +221,16 @@ export default function AuctionForm() {
                           {gang?.name || entry.gangId}
                         </p>
                         <p className="text-xs text-muted-foreground">{entry.item}</p>
-                        <p className="text-sm text-primary font-bold">
-                          ${entry.amount.toLocaleString()}
-                        </p>
+                        <div className="flex gap-2 items-center">
+                          <p className="text-sm text-primary font-bold">
+                            ${entry.amount.toLocaleString()}
+                          </p>
+                          {entry.gears && (
+                            <p className="text-sm text-accent font-bold">
+                              ⚙️ {entry.gears}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <Button
                         type="button"
@@ -221,12 +253,20 @@ export default function AuctionForm() {
               <div className="space-y-2">
                 {Object.entries(totalByGang).map(([gangId, total]) => {
                   const gang = data.gangs.find((g) => g.id === gangId);
+                  const gears = totalGearsByGang[gangId];
                   return (
                     <div key={gangId} className="flex justify-between items-center">
                       <span className="text-sm text-foreground font-mono">{gang?.name}</span>
-                      <span className="text-lg font-bold text-primary">
-                        ${total.toLocaleString()}
-                      </span>
+                      <div className="flex gap-3 items-center">
+                        <span className="text-lg font-bold text-primary">
+                          ${total.toLocaleString()}
+                        </span>
+                        {gears && (
+                          <span className="text-lg font-bold text-accent">
+                            ⚙️ {gears}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}

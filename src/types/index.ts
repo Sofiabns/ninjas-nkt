@@ -32,6 +32,7 @@ export interface Gang {
   description: string;
   color?: string;
   alliedGangIds?: string[];
+  friendGangIds?: string[];
   createdAt: string;
 }
 
@@ -123,6 +124,7 @@ export interface AuctionEntry {
   gangId: string;
   item: string;
   amount: number;
+  gears?: number;
 }
 
 export interface Auction {
