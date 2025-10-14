@@ -51,18 +51,23 @@ export default function GlobalSearch() {
             g.id.toLowerCase().includes(searchTerm)
         );
 
-        const alliedGangIds = new Set<string>();
+        const relatedGangIds = new Set<string>();
 
         // Add the matching gangs themselves
-        matchingGangs.forEach(gang => alliedGangIds.add(gang.id));
+        matchingGangs.forEach(gang => relatedGangIds.add(gang.id));
 
         // Add their allied gangs
         matchingGangs.forEach(gang => {
-          gang.alliedGangIds?.forEach(alliedId => alliedGangIds.add(alliedId));
+          gang.alliedGangIds?.forEach(alliedId => relatedGangIds.add(alliedId));
         });
 
-        // Return all gangs that are either matching or allied
-        return data.gangs.filter(gang => alliedGangIds.has(gang.id));
+        // Add their friend gangs
+        matchingGangs.forEach(gang => {
+          gang.friendGangIds?.forEach(friendId => relatedGangIds.add(friendId));
+        });
+
+        // Return all gangs that are either matching, allied, or friends
+        return data.gangs.filter(gang => relatedGangIds.has(gang.id));
       })()
     : [];
 
