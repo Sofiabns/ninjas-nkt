@@ -210,5 +210,7 @@ INSERT INTO investigators (id, name) VALUES
   ('N-05', 'Lua'),
   ('N-06', 'Hiro'),
   ('N-07', 'Lara'),
-  ('N-08', 'Francisco')
+  ('N-08', 'Francisco'),
+  ('N-09', 'Boris'),
+  ('N-10', 'Kokusai')
 ON CONFLICT (id) DO NOTHING;

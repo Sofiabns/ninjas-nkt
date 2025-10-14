@@ -88,6 +88,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       { id: "N-06", name: "Hiro", attachments: [] },
       { id: "N-07", name: "Lara", attachments: [] },
       { id: "N-08", name: "Francisco", attachments: [] },
+      { id: "N-09", name: "Boris", attachments: [] },
+      { id: "N-10", name: "Kokusai", attachments: [] },
     ],
     people: [],
     vehicles: [],
