@@ -10,11 +10,11 @@ export const validatePhone = (phone: string): boolean => {
 };
 
 export const formatPlate = (value: string): string => {
-  return value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  return value.toUpperCase().slice(0, 20);
 };
 
 export const validatePlate = (plate: string): boolean => {
-  return /^\d{2}[A-Z]{3}\d{3}$/.test(plate);
+  return plate.trim().length > 0;
 };
 
 export const fileToDataUrl = (file: File): Promise<string> => {

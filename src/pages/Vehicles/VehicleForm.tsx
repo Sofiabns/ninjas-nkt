@@ -68,7 +68,7 @@ export default function VehicleForm() {
     }
 
     if (!validatePlate(plate)) {
-      toast.error("Placa inválida. Use o formato NNLLLNNN (ex: 12ABC345)");
+      toast.error("Placa é obrigatória");
       return;
     }
 
@@ -125,14 +125,14 @@ export default function VehicleForm() {
 
           <div>
             <label className="text-sm font-mono text-foreground mb-2 block">
-              PLACA (NNLLLNNN) *
+              PLACA *
             </label>
             <Input
               value={plate}
               onChange={(e) => handlePlateChange(e.target.value)}
-              placeholder="12ABC345"
+              placeholder="Digite a placa do veículo"
               className="bg-input border-border font-mono uppercase"
-              maxLength={8}
+              maxLength={20}
               required
             />
           </div>
