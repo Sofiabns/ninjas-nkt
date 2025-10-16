@@ -44,6 +44,17 @@ export default function GlobalSearch() {
   // Search gangs
   const foundGangs = searchTerm
     ? (() => {
+        // Special keywords
+        if (searchTerm === "aliança" || searchTerm === "alliance") {
+          return data.gangs.filter(gang => gang.alliedGangIds && gang.alliedGangIds.length > 0);
+        }
+        if (searchTerm === "amizades" || searchTerm === "friendship") {
+          return data.gangs.filter(gang => gang.friendGangIds && gang.friendGangIds.length > 0);
+        }
+        if (searchTerm === "registro" || searchTerm === "registro de facção") {
+          return data.gangs; // Show all gangs for registration search
+        }
+
         const matchingGangs = data.gangs.filter(
           (g) =>
             g.name.toLowerCase().includes(searchTerm) ||
@@ -69,6 +80,11 @@ export default function GlobalSearch() {
         // Return all gangs that are either matching, allied, or friends
         return data.gangs.filter(gang => relatedGangIds.has(gang.id));
       })()
+    : [];
+
+  // Search vehicles associated with found gangs
+  const foundGangVehicles = searchTerm && foundGangs.length > 0
+    ? data.vehicles.filter(vehicle => vehicle.gangId && foundGangs.some(gang => gang.id === vehicle.gangId))
     : [];
 
   // Search cases
@@ -156,6 +172,7 @@ export default function GlobalSearch() {
     foundPeople.length +
     foundVehicles.length +
     foundGangs.length +
+    foundGangVehicles.length +
     foundCases.length +
     foundInvestigations.length +
     foundCharges.length +
@@ -333,7 +350,7 @@ export default function GlobalSearch() {
           </h2>
           {foundGangs.map((gang) => {
             const members = data.people.filter((p) => p.gang === gang.name);
-            
+
             return (
               <motion.div
                 key={gang.id}
@@ -354,6 +371,71 @@ export default function GlobalSearch() {
                   <p className="text-xs text-muted-foreground">
                     {members.length} membro(s)
                   </p>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Gang Vehicles Results */}
+      {foundGangVehicles.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+            <Car className="h-5 w-5" />
+            VEÍCULOS DA FACÇÃO ({foundGangVehicles.length})
+          </h2>
+          {foundGangVehicles.map((vehicle) => {
+            const gang = vehicle.gangId ? data.gangs.find((g) => g.id === vehicle.gangId) : null;
+            const owner = data.people.find((p) => p.id === vehicle.ownerId);
+
+            return (
+              <motion.div
+                key={vehicle.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <Card className="p-4 bg-card border-border hover:border-primary transition-all">
+                  <div className="flex items-start gap-4">
+                    {vehicle.attachments.length > 0 && (
+                      <img
+                        src={vehicle.attachments[0].url}
+                        alt={vehicle.model}
+                        className="w-16 h-16 rounded object-cover"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-accent font-mono text-sm">{vehicle.id}</span>
+                        <h3 className="text-lg font-bold text-foreground">{vehicle.plate}</h3>
+                      </div>
+                      <p className="text-sm">
+                        <span className="text-muted-foreground">Modelo:</span> {vehicle.model}
+                      </p>
+                      {gang && (
+                        <p className="text-sm">
+                          <span className="text-muted-foreground">Facção:</span>{" "}
+                          <span style={{ color: gang.color || "inherit" }}>{gang.name}</span>
+                        </p>
+                      )}
+                      {owner && (
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm">
+                            <span className="text-muted-foreground">Proprietário:</span>{" "}
+                            <span
+                              className="text-accent cursor-pointer hover:underline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/people/${owner.id}`);
+                              }}
+                            >
+                              {owner.fullName}
+                            </span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </Card>
               </motion.div>
             );
