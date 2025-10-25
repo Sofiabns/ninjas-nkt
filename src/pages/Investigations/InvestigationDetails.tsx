@@ -51,12 +51,14 @@ export default function InvestigationDetails() {
             </p>
           </div>
 
-          <Button
-            onClick={() => navigate(`/investigations/edit/${investigation.id}`)}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
-          >
-            Editar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate(`/investigations/edit/${investigation.id}`)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
+            >
+              Editar
+            </Button>
+          </div>
         </div>
       </motion.div>
 
