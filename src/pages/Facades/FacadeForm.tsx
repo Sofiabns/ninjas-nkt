@@ -85,12 +85,11 @@ export default function FacadeForm() {
 
           <div>
             <label className="text-sm font-mono text-foreground mb-2 block">FACÇÃO (OPCIONAL)</label>
-            <Select value={gangId} onValueChange={setGangId}>
+            <Select value={gangId || undefined} onValueChange={(value) => setGangId(value)}>
               <SelectTrigger className="bg-input border-border">
                 <SelectValue placeholder="Selecione a facção" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhuma</SelectItem>
                 {data.gangs.map((gang) => (
                   <SelectItem key={gang.id} value={gang.id}>
                     {gang.name}
@@ -98,6 +97,17 @@ export default function FacadeForm() {
                 ))}
               </SelectContent>
             </Select>
+            {gangId && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setGangId("")}
+                className="mt-2 text-xs"
+              >
+                Limpar seleção
+              </Button>
+            )}
           </div>
 
           <div>

@@ -118,19 +118,9 @@ export default function FacadesList() {
       {filteredFacades.length === 0 && (
         <Card className="p-12 text-center bg-card border-border">
           <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground">
             {search ? "Nenhuma fachada encontrada" : "Nenhuma fachada registrada"}
           </p>
-          {!search && (
-            <Button
-              onClick={() => navigate("/facades/new")}
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary/10"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Criar primeira fachada
-            </Button>
-          )}
         </Card>
       )}
     </div>
