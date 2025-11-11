@@ -11,6 +11,7 @@ import {
   Scale,
   Users2,
   Archive,
+  Store,
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ const menuItems = [
   { icon: Building, label: "BASES", path: "/bases" },
   { icon: Scale, label: "COBRANÇAS", path: "/charges" },
   { icon: Users2, label: "GERENCIAR FACÇÕES", path: "/gangs" },
+  { icon: Store, label: "FACHADAS", path: "/facades" },
   { icon: Users, label: "REUNIÕES", path: "/meetings" },
   { icon: Building, label: "DEEPS", path: "/deeps" },
   { icon: Scale, label: "LEILÕES", path: "/auctions" },

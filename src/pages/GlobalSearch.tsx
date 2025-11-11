@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Users, Car, Building, FolderOpen, Scale, Users2 } from "lucide-react";
+import { Search, Users, Car, Building, FolderOpen, Scale, Users2, Store } from "lucide-react";
 import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -168,6 +168,23 @@ export default function GlobalSearch() {
       )
     : [];
 
+  // Search facades
+  const foundFacades = searchTerm
+    ? data.facades.filter(
+        (f) => {
+          const gang = f.gangId ? data.gangs.find((g) => g.id === f.gangId) : null;
+          const members = f.personIds?.map(pid => data.people.find(p => p.id === pid)).filter(Boolean) || [];
+          return (
+            f.name.toLowerCase().includes(searchTerm) ||
+            (f.description && f.description.toLowerCase().includes(searchTerm)) ||
+            f.id.toLowerCase().includes(searchTerm) ||
+            (gang && gang.name.toLowerCase().includes(searchTerm)) ||
+            members.some(p => p?.fullName.toLowerCase().includes(searchTerm))
+          );
+        }
+      )
+    : [];
+
   const totalResults =
     foundPeople.length +
     foundVehicles.length +
@@ -179,7 +196,8 @@ export default function GlobalSearch() {
     foundBases.length +
     foundMeetings.length +
     foundDeeps.length +
-    foundAuctions.length;
+    foundAuctions.length +
+    foundFacades.length;
 
   return (
     <div className="space-y-6">
@@ -671,6 +689,68 @@ export default function GlobalSearch() {
               </Card>
             </motion.div>
           ))}
+        </div>
+      )}
+
+      {/* Facades Results */}
+      {foundFacades.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+            <Store className="h-5 w-5" />
+            FACHADAS ({foundFacades.length})
+          </h2>
+          {foundFacades.map((facade) => {
+            const gang = facade.gangId ? data.gangs.find((g) => g.id === facade.gangId) : null;
+            const members = facade.personIds?.map(pid => data.people.find(p => p.id === pid)).filter(Boolean) || [];
+
+            return (
+              <motion.div
+                key={facade.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+              >
+                <Card
+                  className="p-4 bg-card border-border hover:border-primary transition-all cursor-pointer"
+                  onClick={() => navigate(`/facades/${facade.id}`)}
+                >
+                  <div className="flex items-start gap-4">
+                    {facade.attachments.length > 0 && (
+                      <img
+                        src={facade.attachments[0].url}
+                        alt={facade.name}
+                        className="w-16 h-16 rounded object-cover"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-accent font-mono text-sm">{facade.id}</span>
+                        <h3 className="text-lg font-bold text-foreground">{facade.name}</h3>
+                      </div>
+                      {facade.description && (
+                        <p className="text-sm text-muted-foreground mb-2">{facade.description}</p>
+                      )}
+                      {gang && (
+                        <p className="text-sm">
+                          <span className="text-muted-foreground">Facção:</span>{" "}
+                          <span style={{ color: gang.color || "inherit" }}>{gang.name}</span>
+                        </p>
+                      )}
+                      {members.length > 0 && (
+                        <div className="flex items-center gap-2 flex-wrap mt-2">
+                          <span className="text-xs text-muted-foreground">Membros:</span>
+                          {members.map((m) => m && (
+                            <Badge key={m.id} variant="outline" className="text-xs">
+                              {m.fullName}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       )}
 

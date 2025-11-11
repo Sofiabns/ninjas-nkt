@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator, ActivityLog, Meeting, Deep, Auction, Attachment } from "@/types";
+import { AppData, Person, Vehicle, Gang, Case, Investigation, Charge, Base, Investigator, ActivityLog, Meeting, Deep, Auction, Facade, Attachment } from "@/types";
 import { supabase } from "@/integrations/supabase/supabase";
 import { generateId } from "@/utils/idGenerator";
 import { toast } from "sonner";
@@ -66,6 +66,12 @@ interface AppContextType {
   updateAuction: (id: string, auction: Partial<Auction>) => void;
   deleteAuction: (id: string) => void;
   
+  // Facades
+  addFacade: (facade: Omit<Facade, "id" | "createdAt">) => void;
+  updateFacade: (id: string, facade: Partial<Facade>) => void;
+  deleteFacade: (id: string) => void;
+  getFacade: (id: string) => Facade | undefined;
+  
   // Investigators
   updateInvestigators: (investigators: Investigator[]) => void;
   
@@ -101,6 +107,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     meetings: [],
     deeps: [],
     auctions: [],
+    facades: [],
     activityLogs: [],
   });
   const [currentInvestigator, setCurrentInvestigatorState] = useState<Investigator | null>(null);
@@ -130,6 +137,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           meetingsRes,
           deepsRes,
           auctionsRes,
+          facadesRes,
           logsRes
         ] = await Promise.all([
           supabase.from('investigators').select('*'),
@@ -143,6 +151,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           supabase.from('meetings').select('*'),
           supabase.from('deeps').select('*'),
           supabase.from('auctions').select('*'),
+          supabase.from('facades').select('*'),
           supabase.from('activity_logs').select('*').order('timestamp', { ascending: false }).limit(100)
         ]);
 
@@ -252,6 +261,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               entries: a.entries || [],
               attachments: a.attachments || [],
               createdAt: a.created_at
+            })) || [],
+            facades: facadesRes.data?.map(f => ({
+              id: f.id,
+              name: f.name,
+              description: f.description,
+              gangId: f.gang_id,
+              personIds: f.person_ids || [],
+              attachments: f.attachments || [],
+              createdAt: f.created_at
             })) || [],
             activityLogs: logsRes.data?.map(log => ({
               id: log.id,
@@ -1035,6 +1053,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addActivityLog("Deletou leilão", "Auction", id);
   };
 
+  // Facades methods
+  const addFacade = async (facade: Omit<Facade, "id" | "createdAt">) => {
+    const id = generateId("F", data.facades.map((f) => f.id));
+    const newFacade: Facade = { ...facade, id, createdAt: new Date().toISOString() };
+    
+    const { error } = await supabase.from('facades').insert({
+      id: newFacade.id,
+      name: newFacade.name,
+      description: newFacade.description,
+      gang_id: newFacade.gangId,
+      person_ids: newFacade.personIds,
+      attachments: newFacade.attachments,
+      created_at: newFacade.createdAt
+    });
+    
+    if (error) {
+      toast.error('Erro ao criar fachada');
+      return;
+    }
+    
+    setData((prev) => ({ ...prev, facades: [...prev.facades, newFacade] }));
+    addActivityLog("Criou fachada", "Facade", id);
+  };
+
+  const updateFacade = async (id: string, facade: Partial<Facade>) => {
+    const updateData: any = {};
+    if (facade.name) updateData.name = facade.name;
+    if (facade.description !== undefined) updateData.description = facade.description;
+    if (facade.gangId !== undefined) updateData.gang_id = facade.gangId;
+    if (facade.personIds) updateData.person_ids = facade.personIds;
+    if (facade.attachments !== undefined) updateData.attachments = facade.attachments;
+    
+    const { error } = await supabase.from('facades').update(updateData).eq('id', id);
+    
+    if (error) {
+      toast.error('Erro ao atualizar fachada');
+      return;
+    }
+    
+    setData((prev) => ({
+      ...prev,
+      facades: prev.facades.map((f) => (f.id === id ? { ...f, ...facade } : f)),
+    }));
+    addActivityLog("Atualizou fachada", "Facade", id);
+  };
+
+  const deleteFacade = async (id: string) => {
+    const { error } = await supabase.from('facades').delete().eq('id', id);
+    
+    if (error) {
+      toast.error('Erro ao deletar fachada');
+      return;
+    }
+    
+    setData((prev) => ({ ...prev, facades: prev.facades.filter((f) => f.id !== id) }));
+    addActivityLog("Deletou fachada", "Facade", id);
+  };
+
+  const getFacade = (id: string) => data.facades.find((f) => f.id === id);
+
   // Investigators methods
   const updateInvestigators = (investigators: Investigator[]) => {
     setData((prev) => ({ ...prev, investigators }));
@@ -1096,6 +1174,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     addAuction,
     updateAuction,
     deleteAuction,
+    addFacade,
+    updateFacade,
+    deleteFacade,
+    getFacade,
     updateInvestigators,
     exportData: exportDataMethod,
     importData: importDataMethod,

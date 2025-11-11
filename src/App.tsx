@@ -28,6 +28,9 @@ import ChargeForm from "./pages/Charges/ChargeForm";
 import GangsList from "./pages/Gangs/GangsList";
 import GangForm from "./pages/Gangs/GangForm";
 import GangDetails from "./pages/Gangs/GangDetails";
+import FacadesList from "./pages/Facades/FacadesList";
+import FacadeForm from "./pages/Facades/FacadeForm";
+import FacadeDetails from "./pages/Facades/FacadeDetails";
 import MeetingsList from "./pages/Meetings/MeetingsList";
 import MeetingForm from "./pages/Meetings/MeetingForm";
 import MeetingDetails from "./pages/Meetings/MeetingDetails";
@@ -99,6 +102,10 @@ function App() {
                     <Route path="/gangs/new" element={<GangForm />} />
                     <Route path="/gangs/edit/:id" element={<GangForm />} />
                     <Route path="/gangs/:id" element={<GangDetails />} />
+                    <Route path="/facades" element={<FacadesList />} />
+                    <Route path="/facades/new" element={<FacadeForm />} />
+                    <Route path="/facades/edit/:id" element={<FacadeForm />} />
+                    <Route path="/facades/:id" element={<FacadeDetails />} />
                     <Route path="/meetings" element={<MeetingsList />} />
                     <Route path="/meetings/new" element={<MeetingForm />} />
                     <Route path="/meetings/edit/:id" element={<MeetingForm />} />

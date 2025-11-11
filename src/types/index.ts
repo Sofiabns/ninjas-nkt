@@ -136,6 +136,16 @@ export interface Auction {
   createdAt: string;
 }
 
+export interface Facade {
+  id: string;
+  name: string;
+  description?: string;
+  gangId?: string;
+  personIds: string[];
+  attachments: Attachment[];
+  createdAt: string;
+}
+
 export interface AppData {
   investigators: Investigator[];
   people: Person[];
@@ -148,6 +158,7 @@ export interface AppData {
   meetings: Meeting[];
   deeps: Deep[];
   auctions: Auction[];
+  facades: Facade[];
   activityLogs: ActivityLog[];
   currentInvestigator?: string;
 }

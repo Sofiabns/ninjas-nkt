@@ -128,6 +128,17 @@ CREATE TABLE IF NOT EXISTS auctions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Facades table
+CREATE TABLE IF NOT EXISTS facades (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  gang_id TEXT,
+  person_ids TEXT[] DEFAULT '{}',
+  attachments JSONB DEFAULT '[]',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Activity logs table
 CREATE TABLE IF NOT EXISTS activity_logs (
   id TEXT PRIMARY KEY,
@@ -179,6 +190,7 @@ CREATE INDEX IF NOT EXISTS idx_uploads_deep ON uploads(deep_id);
 CREATE INDEX IF NOT EXISTS idx_uploads_base ON uploads(base_id);
 CREATE INDEX IF NOT EXISTS idx_deeps_gang ON deeps(gang_id);
 CREATE INDEX IF NOT EXISTS idx_bases_gang ON bases(gang_id);
+CREATE INDEX IF NOT EXISTS idx_facades_gang ON facades(gang_id);
 
 -- Add missing columns to existing tables (for updates)
 ALTER TABLE bases ADD COLUMN IF NOT EXISTS gang_id TEXT;
@@ -201,6 +213,7 @@ ALTER TABLE investigations ADD COLUMN IF NOT EXISTS faction_ids TEXT[] DEFAULT '
 ALTER TABLE people ADD COLUMN IF NOT EXISTS deep TEXT;
 ALTER TABLE auctions ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
 ALTER TABLE gangs ADD COLUMN IF NOT EXISTS friend_gang_ids TEXT[] DEFAULT '{}';
+ALTER TABLE uploads ADD COLUMN IF NOT EXISTS facade_id TEXT;
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES

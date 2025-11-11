@@ -26,6 +26,7 @@ export const getDefaultData = (): AppData => ({
   meetings: [],
   deeps: [],
   auctions: [],
+  facades: [],
   activityLogs: [],
 });
 
@@ -51,6 +52,9 @@ export const loadData = (): AppData => {
       }
       if (!parsed.auctions) {
         parsed.auctions = [];
+      }
+      if (!parsed.facades) {
+        parsed.facades = [];
       }
       return parsed;
     }
