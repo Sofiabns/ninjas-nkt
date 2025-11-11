@@ -9,6 +9,7 @@ import { useApp } from "@/contexts/AppContext";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { FileUpload } from "@/components/common/FileUpload";
+import { SearchInput } from "@/components/common/SearchInput";
 import { Attachment } from "@/types";
 
 export default function FacadeForm() {
@@ -21,6 +22,7 @@ export default function FacadeForm() {
   const [gangId, setGangId] = useState<string>("");
   const [personIds, setPersonIds] = useState<string[]>([]);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [personSearch, setPersonSearch] = useState("");
 
   useEffect(() => {
     if (id) {
@@ -113,30 +115,40 @@ export default function FacadeForm() {
           <div>
             <label className="text-sm font-mono text-foreground mb-2 block">MEMBROS (OPCIONAL)</label>
             <p className="text-xs text-muted-foreground mb-2">Selecione pessoas associadas</p>
-            <div className="max-h-48 overflow-y-auto space-y-2 p-3 bg-input rounded border border-border">
-              {data.people.map((person) => (
-                <div key={person.id} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id={`person-${person.id}`}
-                    checked={personIds.includes(person.id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setPersonIds([...personIds, person.id]);
-                      } else {
-                        setPersonIds(personIds.filter((pid) => pid !== person.id));
-                      }
-                    }}
-                    className="w-4 h-4"
-                  />
-                  <label
-                    htmlFor={`person-${person.id}`}
-                    className="text-sm text-foreground cursor-pointer flex-1"
-                  >
-                    {person.fullName} - {person.gang}
-                  </label>
-                </div>
-              ))}
+            <SearchInput
+              value={personSearch}
+              onChange={setPersonSearch}
+              placeholder="Buscar pessoa..."
+            />
+            <div className="max-h-48 overflow-y-auto space-y-2 p-3 bg-input rounded border border-border mt-2">
+              {data.people
+                .filter((person) =>
+                  person.fullName.toLowerCase().includes(personSearch.toLowerCase()) ||
+                  person.gang.toLowerCase().includes(personSearch.toLowerCase())
+                )
+                .map((person) => (
+                  <div key={person.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id={`person-${person.id}`}
+                      checked={personIds.includes(person.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setPersonIds([...personIds, person.id]);
+                        } else {
+                          setPersonIds(personIds.filter((pid) => pid !== person.id));
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <label
+                      htmlFor={`person-${person.id}`}
+                      className="text-sm text-foreground cursor-pointer flex-1"
+                    >
+                      {person.fullName} - {person.gang}
+                    </label>
+                  </div>
+                ))}
             </div>
           </div>
 
