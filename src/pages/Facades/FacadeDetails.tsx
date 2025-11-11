@@ -4,12 +4,24 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useApp } from "@/contexts/AppContext";
-import { Edit, Users, Building2, Image as ImageIcon } from "lucide-react";
+import { Edit, Users, Building2, Image as ImageIcon, ArrowLeft, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function FacadeDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getFacade, data } = useApp();
+  const { getFacade, data, deleteFacade } = useApp();
 
   const facade = id ? getFacade(id) : undefined;
 
@@ -31,22 +43,69 @@ export default function FacadeDetails() {
     .map(pid => data.people.find(p => p.id === pid))
     .filter(Boolean);
 
+  const handleDelete = async () => {
+    if (!id) return;
+    try {
+      await deleteFacade(id);
+      toast.success("Fachada deletada com sucesso");
+      navigate("/facades");
+    } catch (error) {
+      toast.error("Erro ao deletar fachada");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-start justify-between">
-          <div>
-            <span className="text-accent font-mono text-sm">{facade.id}</span>
-            <h1 className="text-4xl font-bold text-primary text-glow">{facade.name}</h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate("/facades")}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar
+            </Button>
+            <div>
+              <span className="text-accent font-mono text-sm">{facade.id}</span>
+              <h1 className="text-4xl font-bold text-primary text-glow">{facade.name}</h1>
+            </div>
           </div>
 
-          <Button
-            onClick={() => navigate(`/facades/edit/${facade.id}`)}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
-          >
-            <Edit className="h-4 w-4 mr-2" />
-            Editar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => navigate(`/facades/edit/${facade.id}`)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Deletar
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Deletar Fachada</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tem certeza que deseja deletar a fachada "{facade.name}"? Esta ação não pode ser desfeita.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Deletar
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
       </motion.div>
 
