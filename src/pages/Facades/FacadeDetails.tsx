@@ -117,7 +117,8 @@ export default function FacadeDetails() {
                   <img
                     src={att.url}
                     alt={att.name}
-                    className="w-full h-32 object-cover rounded border border-border group-hover:border-primary transition-colors"
+                    className="w-full h-32 object-cover rounded border border-border group-hover:border-primary transition-colors cursor-pointer"
+                    onClick={() => window.open(att.url, '_blank')}
                   />
                 ) : (
                   <div className="w-full h-32 flex items-center justify-center bg-secondary rounded border border-border group-hover:border-primary transition-colors">
