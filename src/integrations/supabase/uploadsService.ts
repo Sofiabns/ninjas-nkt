@@ -10,6 +10,7 @@ export async function uploadFile(file: File, options: {
   vehicleId?: string;
   deepId?: string;
   baseId?: string;
+  facadeId?: string;
 }) {
   // Determinar a pasta com base na entidade
   let folder = 'outros';
@@ -21,6 +22,7 @@ export async function uploadFile(file: File, options: {
   else if (options.vehicleId) folder = 'vehicles';
   else if (options.deepId) folder = 'deeps';
   else if (options.baseId) folder = 'bases';
+  else if (options.facadeId) folder = 'facades';
 
   const filePath = `${folder}/${Date.now()}_${file.name}`;
 
@@ -49,6 +51,7 @@ export async function uploadFile(file: File, options: {
     vehicle_id: options.vehicleId || null,
     deep_id: options.deepId || null,
     base_id: options.baseId || null,
+    facade_id: options.facadeId || null,
   });
 
   if (dbError) throw dbError;
@@ -78,6 +81,7 @@ export async function getUploadsByEntity(entityType: string, entityId: string) {
     vehicle: 'vehicle_id',
     deep: 'deep_id',
     base: 'base_id',
+    facade: 'facade_id',
   };
 
   const column = columnMap[entityType as keyof typeof columnMap];
@@ -125,4 +129,9 @@ export async function getUploadsByDeep(id: string) {
 // Buscar uploads vinculados a uma base
 export async function getUploadsByBase(id: string) {
   return getUploadsByEntity('base', id);
+}
+
+// Buscar uploads vinculados a uma fachada
+export async function getUploadsByFacade(id: string) {
+  return getUploadsByEntity('facade', id);
 }

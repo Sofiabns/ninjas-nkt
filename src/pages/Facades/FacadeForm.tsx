@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { FileUpload } from "@/components/common/FileUpload";
 import { SearchInput } from "@/components/common/SearchInput";
 import { Attachment } from "@/types";
+import { uploadFile } from "@/integrations/supabase/uploadsService";
+import { generateId } from "@/utils/idGenerator";
 
 export default function FacadeForm() {
   const navigate = useNavigate();
@@ -37,21 +39,42 @@ export default function FacadeForm() {
     }
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
       toast.error("Preencha o nome da fachada");
       return;
     }
 
-    if (id) {
-      updateFacade(id, { name, description, gangId, personIds, attachments });
-      toast.success("Fachada atualizada");
-    } else {
-      addFacade({ name, description, gangId, personIds, attachments });
-      toast.success("Fachada criada");
+    try {
+      // Upload files to Supabase
+      const uploadedAttachments = [];
+      for (const att of attachments) {
+        if (att.file) {
+          const url = await uploadFile(att.file, { facadeId: id || "new" });
+          uploadedAttachments.push({
+            id: generateId('ATT', []),
+            name: att.name,
+            url: url,
+            type: att.type,
+          });
+        } else {
+          uploadedAttachments.push(att);
+        }
+      }
+
+      if (id) {
+        updateFacade(id, { name, description, gangId, personIds, attachments: uploadedAttachments });
+        toast.success("Fachada atualizada");
+      } else {
+        addFacade({ name, description, gangId, personIds, attachments: uploadedAttachments });
+        toast.success("Fachada criada");
+      }
+      navigate("/facades");
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      toast.error("Erro ao fazer upload dos arquivos");
     }
-    navigate("/facades");
   };
 
   return (
