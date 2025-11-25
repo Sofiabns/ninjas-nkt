@@ -36,7 +36,7 @@ interface AppContextType {
   getCase: (id: string) => Case | undefined;
   
   // Investigations
-  addInvestigation: (investigation: Omit<Investigation, "id" | "createdAt">) => void;
+  addInvestigation: (investigation: Omit<Investigation, "id" | "createdAt" | "status">) => void;
   updateInvestigation: (id: string, investigation: Partial<Investigation>) => void;
   deleteInvestigation: (id: string) => void;
   getInvestigation: (id: string) => Investigation | undefined;
@@ -215,6 +215,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               personIds: i.person_ids || [],
               factionIds: i.faction_ids || [],
               attachments: i.attachments || [],
+              status: (i.status as "active" | "archived") || "active",
+              closedReason: i.closed_reason,
+              closedAt: i.closed_at,
               createdAt: i.created_at
             })) || [],
             charges: chargesRes.data?.map(ch => ({
@@ -678,9 +681,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const getCase = (id: string) => data.cases.find((c) => c.id === id);
 
   // Investigations methods
-  const addInvestigation = async (investigation: Omit<Investigation, "id" | "createdAt">) => {
+  const addInvestigation = async (investigation: Omit<Investigation, "id" | "createdAt" | "status">) => {
     const id = generateId("I", data.investigations.map((i) => i.id));
-    const newInvestigation: Investigation = { ...investigation, id, createdAt: new Date().toISOString() };
+    const newInvestigation: Investigation = { 
+      ...investigation, 
+      id, 
+      status: "active",
+      createdAt: new Date().toISOString() 
+    };
     
     const { error } = await supabase.from('investigations').insert({
       id: newInvestigation.id,
@@ -689,6 +697,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       person_ids: newInvestigation.personIds,
       faction_ids: newInvestigation.factionIds,
       attachments: newInvestigation.attachments,
+      status: newInvestigation.status,
       created_at: newInvestigation.createdAt
     });
     
@@ -708,6 +717,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (investigation.personIds) updateData.person_ids = investigation.personIds;
     if (investigation.factionIds) updateData.faction_ids = investigation.factionIds;
     if (investigation.attachments) updateData.attachments = investigation.attachments;
+    if (investigation.status) updateData.status = investigation.status;
+    if (investigation.closedReason !== undefined) updateData.closed_reason = investigation.closedReason;
+    if (investigation.closedAt !== undefined) updateData.closed_at = investigation.closedAt;
     
     const { error } = await supabase.from('investigations').update(updateData).eq('id', id);
     

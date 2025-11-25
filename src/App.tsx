@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ActiveCases from "./pages/Cases/ActiveCases";
 import ArchivedCases from "./pages/Cases/ArchivedCases";
+import ArchivedInvestigations from "./pages/Investigations/ArchivedInvestigations";
 import CaseForm from "./pages/Cases/CaseForm";
 import CaseDetails from "./pages/Cases/CaseDetails";
 import InvestigationsList from "./pages/Investigations/InvestigationsList";
@@ -81,6 +82,7 @@ function App() {
                     <Route path="/cases/edit/:id" element={<CaseForm />} />
                     <Route path="/cases/:id" element={<CaseDetails />} />
                     <Route path="/investigations" element={<InvestigationsList />} />
+                    <Route path="/investigations/archived" element={<ArchivedInvestigations />} />
                     <Route path="/investigations/new" element={<InvestigationForm />} />
                     <Route path="/investigations/edit/:id" element={<InvestigationForm />} />
                     <Route path="/investigations/:id" element={<InvestigationDetails />} />
