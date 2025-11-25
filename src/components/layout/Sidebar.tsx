@@ -32,6 +32,7 @@ const menuItems = [
   { icon: Building, label: "DEEPS", path: "/deeps" },
   { icon: Scale, label: "LEILÕES", path: "/auctions" },
   { icon: Archive, label: "CASOS ARQUIVADOS", path: "/cases/archived" },
+  { icon: Archive, label: "INVESTIGAÇÕES ARQUIVADAS", path: "/investigations/archived" },
 ];
 
 export const Sidebar: React.FC = () => {

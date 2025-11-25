@@ -69,6 +69,9 @@ CREATE TABLE IF NOT EXISTS investigations (
   person_ids TEXT[] DEFAULT '{}',
   faction_ids TEXT[] DEFAULT '{}',
   attachments JSONB DEFAULT '[]',
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'archived')),
+  closed_reason TEXT,
+  closed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -214,6 +217,9 @@ ALTER TABLE people ADD COLUMN IF NOT EXISTS deep TEXT;
 ALTER TABLE auctions ADD COLUMN IF NOT EXISTS attachments JSONB DEFAULT '[]';
 ALTER TABLE gangs ADD COLUMN IF NOT EXISTS friend_gang_ids TEXT[] DEFAULT '{}';
 ALTER TABLE uploads ADD COLUMN IF NOT EXISTS facade_id TEXT;
+ALTER TABLE investigations ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';
+ALTER TABLE investigations ADD COLUMN IF NOT EXISTS closed_reason TEXT;
+ALTER TABLE investigations ADD COLUMN IF NOT EXISTS closed_at TIMESTAMPTZ;
 
 -- Inserir investigadores padrão
 INSERT INTO investigators (id, name) VALUES

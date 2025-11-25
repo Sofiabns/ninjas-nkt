@@ -1,17 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useApp } from "@/contexts/AppContext";
-import { ArrowLeft, User, FileText, Paperclip, Users } from "lucide-react";
+import { ArrowLeft, User, FileText, Paperclip, Users, Archive, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function InvestigationDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getInvestigation, getPerson, getGang } = useApp();
+  const { getInvestigation, getPerson, getGang, updateInvestigation } = useApp();
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false);
+  const [archiveReason, setArchiveReason] = useState("");
 
   const investigation = id ? getInvestigation(id) : null;
+
+  const handleArchive = () => {
+    if (investigation) {
+      updateInvestigation(investigation.id, {
+        ...investigation,
+        status: "archived",
+        closedReason: archiveReason,
+        closedAt: new Date().toISOString(),
+      });
+      setShowArchiveDialog(false);
+      toast.success("Investigação arquivada");
+      navigate("/investigations");
+    }
+  };
+
+  const handleReactivate = () => {
+    if (investigation) {
+      updateInvestigation(investigation.id, {
+        ...investigation,
+        status: "active",
+        closedReason: undefined,
+        closedAt: undefined,
+      });
+      toast.success("Investigação reativada");
+    }
+  };
 
   if (!investigation) {
     return (
@@ -52,12 +90,32 @@ export default function InvestigationDetails() {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              onClick={() => navigate(`/investigations/edit/${investigation.id}`)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
-            >
-              Editar
-            </Button>
+            {investigation.status === "archived" ? (
+              <Button
+                onClick={handleReactivate}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Reativar
+              </Button>
+            ) : (
+              <>
+                <Button
+                  onClick={() => navigate(`/investigations/edit/${investigation.id}`)}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 box-glow"
+                >
+                  Editar
+                </Button>
+                <Button
+                  onClick={() => setShowArchiveDialog(true)}
+                  variant="outline"
+                  className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <Archive className="h-4 w-4 mr-2" />
+                  Arquivar
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </motion.div>
@@ -206,6 +264,32 @@ export default function InvestigationDetails() {
           </div>
         </Card>
       )}
+
+      {/* Dialog de Arquivamento */}
+      <Dialog open={showArchiveDialog} onOpenChange={setShowArchiveDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Arquivar Investigação</DialogTitle>
+            <DialogDescription>
+              Informe o motivo do arquivamento desta investigação (opcional).
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Motivo do arquivamento..."
+            value={archiveReason}
+            onChange={(e) => setArchiveReason(e.target.value)}
+            className="min-h-[100px]"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowArchiveDialog(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleArchive} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Arquivar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

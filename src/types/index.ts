@@ -65,6 +65,9 @@ export interface Investigation {
   personIds: string[];
   factionIds?: string[];
   attachments: Attachment[];
+  status: "active" | "archived";
+  closedReason?: string;
+  closedAt?: string;
   createdAt: string;
 }
 
